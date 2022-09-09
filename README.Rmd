@@ -76,3 +76,6 @@ Odirect(A.delicatus, A.delicatus_ecoregion, overlap.null)
 Ox(A.delicatus, A.delicatus_ecoregion, overlap.null)
 Oxy(A.delicatus, A.delicatus_ecoregion, overlap.null)
 ```
+
+Data from:
+Barratt, C.D., Bwong, B.A., Jehle, R., Liedtke, C.H., Nagel, P., Onstein, R.E., Portik, D.M., Streicher, J.W. & Loader, S.P. (2018) Vanishing refuge? Testing the forest refuge hypothesis in coastal East Africa using genome‐wide sequence data for seven amphibians. Molecular Ecology, 27, 4289-4308.
