@@ -10,7 +10,7 @@ Description: Functions to calculate boundary and boundary overlap statistics for
     derivatives across latitude and longitude. The package can conduct statistical
     boundary and boundary overlap tests and produce null distributions for those
     tests using the input data.
-License: GPL-3
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Imports:
