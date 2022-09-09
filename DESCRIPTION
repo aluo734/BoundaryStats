@@ -1,0 +1,36 @@
+Package: BoundaryStats
+Type: Package
+Title: Calculation of Boundary Overlap Statistics
+Version: 1.0.0
+Author: Amy Luo
+Maintainer: Amy Luo <aluo@vols.utk.edu>
+Description: Functions to calculate boundary and boundary overlap statistics for
+    two spatially distributed traits using raster data. If data are trait values,
+    trait data are transformed to boundary intensities based on approximate first
+    derivatives across latitude and longitude. The package can conduct statistical
+    boundary and boundary overlap tests and produce null distributions for those
+    tests using the input data.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports:
+  sf,
+  sp,
+  terra,
+  spatialEco,
+  pdqr,
+  rnaturalearth,
+  spdep,
+  spatialreg,
+  gstat,
+  methods,
+  ggplot2,
+  tibble,
+  magrittr,
+  raster,
+  igraph
+Depends:
+  R (>= 4.1.0)
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 7.2.1

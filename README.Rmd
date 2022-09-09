@@ -1,0 +1,78 @@
+---
+output:
+  github_document:
+    html_preview: false
+editor_options: 
+  chunk_output_type: console
+always_allow_html: yes
+---
+
+# BoundaryStats
+
+BoundaryStats was designed to test for the presence geographic boundaries in ecological variables and overlap between such boundaries. Users can calculate boundary and boundary overlap statistics with raster data. BoundaryStats can create null distributions for the statistics based on various neutral landscape models that are parameterized on the empirical data. The primary functions are statistical tests for the presence of spatial boundaries of a variable and significant overlap between the spatial boundaries of two variables.
+
+## Installation
+
+You can install BoundaryStats with:
+``` {r eval = F}
+remotes::install_github("aluo734/BoundaryStats")
+```
+
+## Statistical Tests
+
+```{r warning=FALSE, message = FALSE, results='asis', echo=FALSE, cache=FALSE}
+library(tibble)
+library(magrittr)
+library(knitr)
+library(kableExtra)
+
+stat_functions <- tibble(Function = character(), Category = character(), Description = character())
+
+stat_functions[1,1] <- 'n_subgraph'
+stat_functions[1,2] <- 'Boundary'
+stat_functions[1,3] <- 'The number of subgraphs, or sets of contiguous boundary elements, in the data.'
+
+stat_functions[2,1] <- 'max_subgraph'
+stat_functions[2,2] <- 'Boundary'
+stat_functions[2,3] <- 'The length of the longest subgraph, or set of contiguous boundary elements.'
+
+stat_functions[3,1] <- 'Odirect'
+stat_functions[3,2] <- 'Boundary Overlap'
+stat_functions[3,3] <- 'The number of directly overlapping boundary elements of two traits.'
+
+stat_functions[4,1] <- 'Ox'
+stat_functions[4,2] <- 'Boundary Overlap'
+stat_functions[4,3] <- 'The average minimum distance between each boundary element in raster x and the nearest boundary element in raster y. Uses Euclidean distance. The boundaries of trait x depend on the boundaries of trait y.'
+
+stat_functions[5,1] <- 'Oxy'
+stat_functions[5,2] <- 'Boundary Overlap'
+stat_functions[5,3] <- 'The average minimum distance between boundary elements in two raster layers. Uses Euclidean distance. Boundaries for each trait affect one another reciprocally (x affects y and y affects x).'
+
+kable(stat_functions) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+## Example
+
+```{r eval = F}
+library(BoundaryStats)
+library(tidyverse)
+library(raster)
+
+data(ecoregions)
+data(A.delicatus)
+
+A.delicatus_ecoregion <- resample(ecoregions, A.delicatus) %>%
+  crop(., A.delicatus) %>%
+  mask(., A.delicatus) %>%
+  categorical_boundary(., projection = 4210)
+A.delicatus <- crop(A.delicatus, A.delicatus_ecoregion) %>%
+  mask(., A.delicatus_ecoregion)
+A.delicatus <- categorical_boundary(A.delicatus, projection = 4210)
+
+overlap.null <- overlap_null_distrib(A.delicatus, A.delicatus_ecoregion, x_cat = T, y_cat = T, n_iterations = 100, projection = 4210, x_model = 'random_cluster', y_model = 'random_cluster')
+
+Odirect(A.delicatus, A.delicatus_ecoregion, overlap.null)
+Ox(A.delicatus, A.delicatus_ecoregion, overlap.null)
+Oxy(A.delicatus, A.delicatus_ecoregion, overlap.null)
+```
