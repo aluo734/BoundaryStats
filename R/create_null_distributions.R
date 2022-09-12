@@ -2,11 +2,11 @@
 #' @name overlap_null_distrib
 #' @title Null distribution for boundary overlap statistics
 #' @description
-#' Create a null distribution for boundary overlap statistics, given a pair of variables.
-#'
-#' Given two RasterLayer objects with the same range and resolution, this function will
-#' simulate random rasters with boundary elements, then calculate boundary overlap
-#' statistics for n iterations. Statistics for all iterations are returned in a data frame.
+#' Given two RasterLayer objects with the same extent and resolution, this function will simulate new
+#' RasterLayer objects from neutral models for a specified number of iterations. In each iteration,
+#' boundary statistics will be computed for the simulated surface. The function outputs probability
+#' functions for three boundary statistics (directly overlapping boundary elements, minimum distance
+#' between boundary elements in x to y, and minimum distance between elements in x and y).
 #'
 #' @param x A RasterLayer object.
 #' @param y A RasterLayer object.
@@ -167,12 +167,12 @@ overlap_null_distrib <- function(x, y, x_convert = F, y_convert = F, x_cat = F, 
 #' @name boundary_null_distrib
 #' @title Null distribution for overlap statistics
 #' @description
-#' Given a RasterLayer object, this function will randomize the placement of
-#' boundary elements in the same range, then calculate boundary statistics for
-#' the simulated raster for n iterations. Statistical outputs of all iterations
-#' for statistics are returned in a dataframe
+#' Given a RasterLayer object, this function will simulate a new RasterLayer from a neutral model for a
+#' specified number of iterations. In each iteration, boundary statistics will be computed for the simulated
+#' surface. The function outputs probability functions for two boundary statistics (number of subgraphs
+#' and length of the longest subgraph).
 #'
-#' @param x A RasterLayer object (numeric data) or SpatRaster (categorical data) object.
+#' @param x A RasterLayer object.
 #' @param convert TRUE if x contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.
 #' @param cat TRUE if the input RasterLayer contains a categorical variable. default = FALSE.
 #' @param threshold A value between 0 and 1. The proportion of cells to keep as boundary elements. default = 0.2.
@@ -184,7 +184,7 @@ overlap_null_distrib <- function(x, y, x_convert = F, y_convert = F, x_cat = F, 
 #' @param projection Numeric. EPSG code of input raster layer.
 #' @param progress If progress = TRUE (default) a progress bar will be displayed.
 #'
-#' @return A list of probability distribution functions for boundary statistics.
+#' @return A list of two probability distribution functions for boundary statistics.
 #' @examples
 #' song_dialect_raster <- raster('song_dialect_boundaries.asc')
 #' null_dialect_boundary <- boundary_null_distrib(song_raster, threshold = 0.2,

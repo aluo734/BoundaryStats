@@ -1,21 +1,19 @@
 # define boundary with numeric data ----
 #' @name define_boundary
-#' @title Define the boundary elements of a RasterLayer with numeric data
+#' @title Define the boundary elements of a RasterLayer with numeric data or boundary intensities
 #' @description
 #'
-#' Defines boundaries in raster objects by keeping a proportion of the cells with the highest
-#' boundary intensity values. If cells have trait values, they can be converted to boundary
-#' values based on approximations of the first partial derivatives of each cell, calculated
-#' using a sobel operator.
+#' Defines boundaries in a RasterLayer object by keeping a proportion of the cells with the highest
+#' boundary intensity values. If the RasterLayer contains trait values, the values can be converted
+#' to boundary values (convert = T) using a sobel operator.
 #'
 #' @importFrom raster values as.matrix extent crs
 #'
 #' @param x A RasterLayer object.
 #' @param threshold A value between 0 and 1. The proportion of cells to keep as boundary elements. default = 0.2.
-#' @param convert logical. If TRUE, will convert values of each cell from trait values to boundary intensities. default = FALSE.
-#' value to the estimated rate of change at that cell using a sobel operator. default = FALSE.
+#' @param convert logical. If TRUE, convert values of each cell from trait values to boundary intensities. default = FALSE.
 #'
-#' @return A RasterLayer object with cell values 1 for boundary element and NA for other cell
+#' @return A RasterLayer object with cell values 1 for boundary elements and 0 for other cells
 #' @examples
 #' genetic_assignments <- raster('genetic_assignments.asc')
 #' genetic_boundary <- define_boundary(genetic_assignments, threshold = 0.2, convert = T)
@@ -33,7 +31,7 @@ define_boundary <- function (x, threshold = 0.2, convert = F) {
   if (convert == T) {x <- spatialEco::sobal(x)}
 
   # sort the cell values from highest to lowest, then find the value above which only the threshold
-  # proportion (default = 0.2) of cells would be kept
+  # proportion of cells would be kept
   threshold_value <- values(x) %>%
     na.omit(.) %>%
     sort(., decreasing = T) %>%
@@ -116,7 +114,7 @@ define_boundary <- function (x, threshold = 0.2, convert = F) {
 #' @description Creates boundary element cells where patches of two categories meet.
 #'
 #' @param x A Rasterlayer object.
-#' @param projection The EPSG code of the input layer CRS. Numeric.
+#' @param projection Numeric. The EPSG code of the input layer CRS.
 #'
 #' @return A RasterLayer object with cell values 1 for boundary elements and 0 for other cells
 #' @examples

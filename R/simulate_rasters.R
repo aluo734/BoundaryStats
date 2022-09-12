@@ -1,21 +1,20 @@
 #' @name simulate_rasters
-#' @title Simulates rasters with boundary elements
+#' @title Simulates rasters with boundary elements.
 #' @description Internal function that simulates a raster of the same extent and resolution as
-#' the input raster, then defines boundaries
-#' of the simulated raster.
+#' the input raster using a neutral model, then defines boundaries in the simulated raster.
 #'
 #' @param x A RasterLayer object.
 #' @param model Neutral model to use. Options: 'random', 'gaussian_random' (Gaussian random field),
 #' 'autoregressive' (simultaneous autoregressive model), and 'random_cluster' (modified random clusters method)
 #' @param projection Numeric. EPSG code of input raster layer.
 #'
-#' @return A RasterLayer object with simulated values based on input data.
+#' @return A RasterLayer object with boundary elements.
 #'
+#' @details This is an internal function.
+#' @author Amy Luo
 #' @references
 #' Saura, S. & Martínez-Millán, J. (2000) Landscape patterns simulation with a modified random clusters method. Landscape Ecology, 15, 661 – 678.
 #' James, P. M. A., Fleming, R.A., & Fortin, M.-J. (2010) Identifying significant scale-specific spatial boundaries using wavelets and null models: Spruce budworm defoliation in Ontario, Canada as a case study. Landscape Ecology, 6, 873-887.
-#'
-#' @details This is an internal function.
 simulate_rasters <- function (x, model, projection) {
   if (model == 'random') {
     #### RANDOM ####
