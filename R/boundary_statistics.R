@@ -4,9 +4,9 @@
 #' @description Statistical test the for number of subgraphs, or sets of contiguous boundary elements, in the data.
 #'
 #' @param x A RasterLayer object with boundary elements.
-#' @param null_distrib A list of pdqr functions representing a probability distribution. Output from boundary_null_distrib().
+#' @param null_distrib A list of probability functions output from boundary_null_distrib().
 #'
-#' @return The number of subgraphs and a p-value.
+#' @return The number of subgraphs in the RasterLayer and a p-value.
 #' @examples
 #' song_raster <- raster('song_dialect_boundaries.asc')
 #' dialect_boundaries <- define_boundary(song_raster, 0.1)
@@ -42,10 +42,10 @@ n_subgraph <- function(x, null_distrib) {
 #' @description Statistical test for the length of the longest subgraph, or set of contiguous boundary elements.
 #'
 #' @param x A RasterLayer object with boundary elements.
-#' @param null_distrib A list of pdqr functions representing a probability distribution. Output from boundary_null_distrib().
+#' @param null_distrib A list of probability functions output from boundary_null_distrib().
 #' @param projection Numeric. EPSG code of input raster layer.
 #'
-#' @return The number of subgraphs and a p-value.
+#' @return The length of the longest subgraph and a p-value.
 #' @examples
 #' song_raster <- raster('song_dialect_boundaries.asc')
 #' dialect_boundaries <- define_boundary(song_raster, 0.1)
@@ -100,54 +100,3 @@ max_subgraph <- function(x, null_distrib, projection) {
   names(max_length) <- 'length of longest boundary'
   return(c(max_length, p))
 }
-
-# # number of singleton boundary elements--will be meaningless if I remove singletons in define_boundary() ----
-#' n_singletons(x, random_boundary_distrib)
-#'
-#' #' @name n_singletons
-#' #' @title Number of isolated boundary elements
-#' #' @description
-#' #' Counts the number of isolated boundary elements with no neighboring boundary elements and tests whether
-#' #' the number of singletons is significantly less than expected by chance.
-#' #'
-#' #' @param x A RasterLayer object with boundary elements.
-#' #' @param null_distrib A vector of values containing iterations of a null model.
-#' #'
-#' #' @return The number of isolated boundary elements and a p-value.
-#' #'
-#' #' @author Amy Luo
-#' #' @references Jacquez, G.M., Maruca,I S. & Fortin M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
-#' #' @export
-#' n_singletons <- function (x, null_distrib) {
-#'   count = 0
-#'   for (row in 1:nrow(boundaries)) {
-#'     for (col in 1:ncol(boundaries)) {
-#'       if (!is.na(boundaries[row, col])) {
-#'         if(boundaries[row, col] == 1) {
-#'           # name all neighboring cells
-#'           if (row > 1) {up = boundaries[row - 1, col]} else {up = NA}
-#'           if (row < nrow(boundaries)) {down = boundaries[row + 1, col]} else {down = NA}
-#'           if (col > 1) {left = boundaries[row, col - 1]} else {left = NA}
-#'           if (col < ncol(boundaries)) {right = boundaries[row, col + 1]} else {right = NA}
-#'
-#'           if (row > 1 & col > 1) {upleft = boundaries[row - 1, col - 1]} else {upleft = NA}
-#'           if (row > 1 & col < ncol(boundaries)) {upright = boundaries[row - 1, col + 1]} else {upright = NA}
-#'           if (row < nrow(boundaries) & col > 1) {downleft = boundaries[row + 1, col - 1]} else {downleft = NA}
-#'           if (row < nrow(boundaries) & col < ncol(boundaries)) {downright = boundaries[row + 1, col + 1]} else {downright = NA}
-#'
-#'           # test whether any neighbors are boundary elements
-#'           neighbors <- c(up, down, left, right, upleft, upright, downleft, downright)
-#'
-#'           # if not, then add one to the count
-#'           if(1 %in% neighbors == F) {boundaries[row, col] = 0}
-#'         }
-#'       }
-#'     }
-#'   }
-#'
-#'   p <- null_distrib$n_singletons(count) %>%
-#'     as.numeric(.)
-#'   names(p) <- 'p-value'
-#'   names(count) <- 'n isolated boundary elements'
-#'   return(c(count, p))
-#' }

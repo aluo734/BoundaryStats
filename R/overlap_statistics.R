@@ -1,13 +1,13 @@
 # Odirect ----
 #' @name Odirect
-#' @title Direct overlap between boundary elements
+#' @title Direct overlap between boundary elements.
 #' @description Statistical test for the number of directly overlapping boundary elements of two traits.
 #'
 #' @param x A RasterLayer object with boundary elements.
 #' @param y A RasterLayer object with boundary elements.
-#' @param null_distrib A list of functions representing probability distributions. Output from overlap_null_distrib().
+#' @param null_distrib A list of probability functions output from overlap_null_distrib().
 #'
-#' @return p-value
+#' @return The number of directly overlapping boundary elements and a p-value.
 #' @examples
 #' soil_raster <- raster('soil_types.asc')
 #' genetic_raster <- raster('genetic_assignment_probabilities.asc')
@@ -48,7 +48,7 @@ Odirect <- function(x, y, null_distrib) {
 
 # Ox ----
 #' @name Ox
-#' @title Average minimum distance from x boundary elements to nearest y boundary element
+#' @title Average minimum distance from x boundary elements to nearest y boundary element.
 #' @description
 #' Statistical test for the average minimum distance between each boundary element in raster x
 #' and the nearest boundary element in raster y. Uses Euclidean distance. The boundaries of
@@ -56,9 +56,9 @@ Odirect <- function(x, y, null_distrib) {
 #'
 #' @param x A RasterLayer object with boundary elements.
 #' @param y A RasterLayer object with boundary elements.
-#' @param null_distrib A list of functions representing probability distributions. Output from overlap_null_distrib().
+#' @param null_distrib A list of probability functions output from overlap_null_distrib().
 #'
-#' @return p-value
+#' @return The average minimum distance and a p-value.
 #' @examples
 #' soil_raster <- raster('soil_types.asc')
 #' genetic_raster <- raster('genetic_assignment_probabilities.asc')
@@ -117,7 +117,7 @@ Ox <- function(x, y, null_distrib) {
 #'
 #' @param x A RasterLayer object with boundary elements.
 #' @param y A RasterLayer object with boundary elements.
-#' @param null_distrib A list of functions representing probability distributions. Output from overlap_null_distrib().
+#' @param null_distrib A list of probability functions output from overlap_null_distrib().
 #'
 #' @return p-value
 #' @examples

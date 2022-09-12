@@ -4,12 +4,10 @@
 #' This is a wrapper function for ggplot2 that will produce a map of boundary
 #' elements for two traits and show where boundary elements intersect.
 #'
-#' @importFrom raster raster as.data.frame extent
-#'
 #' @param x A RasterLayer object with boundary elements.
 #' @param y A RasterLayer object with boundary elements.
-#' @param col A character vector of up to three colors representing the x boundary, y boundary, and overlapping elements, respectively.
-#' @param trait_names A character vector with up to two elements. Legend name for x input, legend name for y input.
+#' @param col Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).
+#' @param trait_names Optional. A character vector with up to two elements (legend name for x and legend name for y).
 #'
 #' @return A ggplot object.
 #' @examples
@@ -20,10 +18,10 @@
 #' @export
 plot_boundary <- function(x, y, col = NA, trait_names = NA) {
   # prep boundary layers to plot
-  x_layer <- as.data.frame(x, xy = T, na.rm = T) %>%
+  x_layer <- raster::as.data.frame(x, xy = T, na.rm = T) %>%
     .[.[,3] != 0,]
   colnames(x_layer) <- c('lon', 'lat', 'values')
-  y_layer <- as.data.frame(y, xy = T, na.rm = T) %>%
+  y_layer <- raster::as.data.frame(y, xy = T, na.rm = T) %>%
     .[.[,3] != 0,]
   colnames(y_layer) <- c('lon', 'lat', 'values')
 
@@ -40,9 +38,9 @@ plot_boundary <- function(x, y, col = NA, trait_names = NA) {
     }
   }
 
-  overlap <- raster(overlap)
+  overlap <- raster::raster(overlap)
   raster::extent(overlap) <- raster::extent(x)
-  overlap <- as.data.frame(overlap, xy = T, na.rm = T)
+  overlap <- raster::as.data.frame(overlap, xy = T, na.rm = T)
   colnames(overlap) <- c('lon', 'lat', 'values')
 
 # if there are inputs for colors and layer names, change the colors from default
