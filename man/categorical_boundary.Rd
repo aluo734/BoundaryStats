@@ -9,7 +9,7 @@ categorical_boundary(x, projection)
 \arguments{
 \item{x}{A Rasterlayer object.}
 
-\item{projection}{The EPSG code of the input layer CRS. Numeric.}
+\item{projection}{Numeric. The EPSG code of the input layer CRS.}
 }
 \value{
 A RasterLayer object with cell values 1 for boundary elements and 0 for other cells

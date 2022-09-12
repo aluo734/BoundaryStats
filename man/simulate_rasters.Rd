@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_rasters.R
 \name{simulate_rasters}
 \alias{simulate_rasters}
-\title{Simulates rasters with boundary elements}
+\title{Simulates rasters with boundary elements.}
 \usage{
 simulate_rasters(x, model, projection)
 }
@@ -15,12 +15,11 @@ simulate_rasters(x, model, projection)
 \item{projection}{Numeric. EPSG code of input raster layer.}
 }
 \value{
-A RasterLayer object with simulated values based on input data.
+A RasterLayer object with boundary elements.
 }
 \description{
 Internal function that simulates a raster of the same extent and resolution as
-the input raster, then defines boundaries
-of the simulated raster.
+the input raster using a neutral model, then defines boundaries in the simulated raster.
 }
 \details{
 This is an internal function.
@@ -28,4 +27,7 @@ This is an internal function.
 \references{
 Saura, S. & Martínez-Millán, J. (2000) Landscape patterns simulation with a modified random clusters method. Landscape Ecology, 15, 661 – 678.
 James, P. M. A., Fleming, R.A., & Fortin, M.-J. (2010) Identifying significant scale-specific spatial boundaries using wavelets and null models: Spruce budworm defoliation in Ontario, Canada as a case study. Landscape Ecology, 6, 873-887.
+}
+\author{
+Amy Luo
 }

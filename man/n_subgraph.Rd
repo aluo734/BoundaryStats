@@ -9,10 +9,10 @@ n_subgraph(x, null_distrib)
 \arguments{
 \item{x}{A RasterLayer object with boundary elements.}
 
-\item{null_distrib}{A list of pdqr functions representing a probability distribution. Output from boundary_null_distrib().}
+\item{null_distrib}{A list of probability functions output from boundary_null_distrib().}
 }
 \value{
-The number of subgraphs and a p-value.
+The number of subgraphs in the RasterLayer and a p-value.
 }
 \description{
 Statistical test the for number of subgraphs, or sets of contiguous boundary elements, in the data.

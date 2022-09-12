@@ -16,7 +16,7 @@ boundary_null_distrib(
 )
 }
 \arguments{
-\item{x}{A RasterLayer object (numeric data) or SpatRaster (categorical data) object.}
+\item{x}{A RasterLayer object.}
 
 \item{convert}{TRUE if x contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.}
 
@@ -36,13 +36,13 @@ statistical tests. default = 10.}
 \item{progress}{If progress = TRUE (default) a progress bar will be displayed.}
 }
 \value{
-A list of probability distribution functions for boundary statistics.
+A list of two probability distribution functions for boundary statistics.
 }
 \description{
-Given a RasterLayer object, this function will randomize the placement of
-boundary elements in the same range, then calculate boundary statistics for
-the simulated raster for n iterations. Statistical outputs of all iterations
-for statistics are returned in a dataframe
+Given a RasterLayer object, this function will simulate a new RasterLayer from a neutral model for a
+specified number of iterations. In each iteration, boundary statistics will be computed for the simulated
+surface. The function outputs probability functions for two boundary statistics (number of subgraphs
+and length of the longest subgraph).
 }
 \examples{
 song_dialect_raster <- raster('song_dialect_boundaries.asc')

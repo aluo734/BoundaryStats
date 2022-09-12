@@ -11,9 +11,9 @@ plot_boundary(x, y, col = NA, trait_names = NA)
 
 \item{y}{A RasterLayer object with boundary elements.}
 
-\item{col}{A character vector of up to three colors representing the x boundary, y boundary, and overlapping elements, respectively.}
+\item{col}{Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).}
 
-\item{trait_names}{A character vector with up to two elements. Legend name for x input, legend name for y input.}
+\item{trait_names}{Optional. A character vector with up to two elements (legend name for x and legend name for y).}
 }
 \value{
 A ggplot object.
