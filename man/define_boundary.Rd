@@ -2,7 +2,7 @@
 % Please edit documentation in R/define_boundaries.R
 \name{define_boundary}
 \alias{define_boundary}
-\title{Define the boundary elements of a RasterLayer with numeric data}
+\title{Define the boundary elements of a RasterLayer with numeric data or boundary intensities}
 \usage{
 define_boundary(x, threshold = 0.2, convert = F)
 }
@@ -11,17 +11,15 @@ define_boundary(x, threshold = 0.2, convert = F)
 
 \item{threshold}{A value between 0 and 1. The proportion of cells to keep as boundary elements. default = 0.2.}
 
-\item{convert}{logical. If TRUE, will convert values of each cell from trait values to boundary intensities. default = FALSE.
-value to the estimated rate of change at that cell using a sobel operator. default = FALSE.}
+\item{convert}{logical. If TRUE, convert values of each cell from trait values to boundary intensities. default = FALSE.}
 }
 \value{
-A RasterLayer object with cell values 1 for boundary element and NA for other cell
+A RasterLayer object with cell values 1 for boundary elements and 0 for other cells
 }
 \description{
-Defines boundaries in raster objects by keeping a proportion of the cells with the highest
-boundary intensity values. If cells have trait values, they can be converted to boundary
-values based on approximations of the first partial derivatives of each cell, calculated
-using a sobel operator.
+Defines boundaries in a RasterLayer object by keeping a proportion of the cells with the highest
+boundary intensity values. If the RasterLayer contains trait values, the values can be converted
+to boundary values (convert = T) using a sobel operator.
 }
 \examples{
 genetic_assignments <- raster('genetic_assignments.asc')

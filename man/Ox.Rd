@@ -2,7 +2,7 @@
 % Please edit documentation in R/overlap_statistics.R
 \name{Ox}
 \alias{Ox}
-\title{Average minimum distance from x boundary elements to nearest y boundary element}
+\title{Average minimum distance from x boundary elements to nearest y boundary element.}
 \usage{
 Ox(x, y, null_distrib)
 }
@@ -11,10 +11,10 @@ Ox(x, y, null_distrib)
 
 \item{y}{A RasterLayer object with boundary elements.}
 
-\item{null_distrib}{A list of functions representing probability distributions. Output from overlap_null_distrib().}
+\item{null_distrib}{A list of probability functions output from overlap_null_distrib().}
 }
 \value{
-p-value
+The average minimum distance and a p-value.
 }
 \description{
 Statistical test for the average minimum distance between each boundary element in raster x

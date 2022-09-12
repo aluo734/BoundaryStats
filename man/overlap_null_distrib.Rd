@@ -52,11 +52,11 @@ and 'random_cluster' (modified random clusters method)}
 A list of probability distribution functions for boundary overlap statistics.
 }
 \description{
-Create a null distribution for boundary overlap statistics, given a pair of variables.
-
-Given two RasterLayer objects with the same range and resolution, this function will
-simulate random rasters with boundary elements, then calculate boundary overlap
-statistics for n iterations. Statistics for all iterations are returned in a data frame.
+Given two RasterLayer objects with the same extent and resolution, this function will simulate new
+RasterLayer objects from neutral models for a specified number of iterations. In each iteration,
+boundary statistics will be computed for the simulated surface. The function outputs probability
+functions for three boundary statistics (directly overlapping boundary elements, minimum distance
+between boundary elements in x to y, and minimum distance between elements in x and y).
 }
 \examples{
 song_dialect_raster <- raster('song_dialect_boundaries.asc')
