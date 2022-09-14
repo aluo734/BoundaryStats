@@ -7,8 +7,6 @@
 #' boundary intensity values. If the RasterLayer contains trait values, the values can be converted
 #' to boundary values (convert = T) using a sobel operator.
 #'
-#' @importFrom raster values as.matrix extent crs
-#'
 #' @param x A RasterLayer object.
 #' @param threshold A value between 0 and 1. The proportion of cells to keep as boundary elements. default = 0.2.
 #' @param convert logical. If TRUE, convert values of each cell from trait values to boundary intensities. default = FALSE.
@@ -32,7 +30,7 @@ define_boundary <- function (x, threshold = 0.2, convert = F) {
 
   # sort the cell values from highest to lowest, then find the value above which only the threshold
   # proportion of cells would be kept
-  threshold_value <- values(x) %>%
+  threshold_value <- raster::values(x) %>%
     na.omit(.) %>%
     sort(., decreasing = T) %>%
     utils::head(., round(length(.) * threshold)) %>%
@@ -40,28 +38,28 @@ define_boundary <- function (x, threshold = 0.2, convert = F) {
 
   # Check proportion of cells above threshold value. Sometimes there are a lot of redundant cell values, so if there
   # are redundancies at the threshold value, then the proportion of cells kept will be higher than the threshold.
-  prop <- values(x) %>%
+  prop <- raster::values(x) %>%
     na.omit(.) %>%
     .[. >= threshold_value] %>%
-    length(.)/length(na.omit(values(x)))
+    length(.)/length(na.omit(raster::values(x)))
 
   # so we'll keep reducing the threshold value until the proportion of cells kept is below the threshold
   if (threshold_value %% 1 == 0) {                # sometimes the boundary values are integers
     while (prop > threshold) {
       threshold_value = threshold_value + 1       # so increase the threshold value by 1
-      prop <- values(x) %>%
+      prop <- raster::values(x) %>%
         na.omit(.) %>%
         .[. >= threshold_value] %>%
-        length(.)/length(na.omit(values(x)))
+        length(.)/length(na.omit(raster::values(x)))
       }
     } else {                                      # sometimes the boundary values are float
     rep = 0
     while (prop > threshold) {
       threshold_value = threshold_value * 1.1     # so increase the threshold value by 10%
-      prop <- values(x) %>%                       # until the proportion of cells kept < threshold
+      prop <- raster::values(x) %>%               # until the proportion of cells kept < threshold
         na.omit(.) %>%
         .[. >= threshold_value] %>%
-        length(.)/length(na.omit(values(x)))
+        length(.)/length(na.omit(raster::values(x)))
       rep = rep + 1
       if (rep >= 10) {break}                      # break after 10 reps if it gets that far
       }
@@ -102,7 +100,7 @@ define_boundary <- function (x, threshold = 0.2, convert = F) {
     }
   }
 
-  boundaries <- raster(boundaries)
+  boundaries <- raster::raster(boundaries)
   raster::extent(boundaries) <- raster::extent(x)
   return(boundaries)
 
