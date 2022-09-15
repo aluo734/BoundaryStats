@@ -45,7 +45,8 @@ plot_boundary <- function(x, y, color = NA, trait_names = NA) {
 
 # if there are inputs for colors and layer names, change the colors from default
   fill_col <- c('Trait 1' = '#6EC6CA', 'Trait 2' = '#CCABD8', 'Overlap' = '#055B5C')
-  if (all(is.na(color))) {fill_col <- fill_col
+  if (all(is.na(color))) {
+    fill_col <- fill_col
   } else if (length(color) > 1) {
     if(!is.na(color[1])) {fill_col[1] = color[1]}
     if(!is.na(color[2])) {fill_col[2] = color[2]}
