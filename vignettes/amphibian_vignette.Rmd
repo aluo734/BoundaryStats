@@ -74,7 +74,7 @@ The function boundary_null_distrib() simulates neutral landscapes based on the i
 Multiple neutral models are available: complete stochasticity (default), random Gaussian fields, simultaneous spatial autoregressive models, and modified random cluster. Random cluster models are suited to categorical variables (cat = T), so we use it here.
 
 ```{r}
-A.deli_bound.null <- boundary_null_distrib(A.delicatus, cat = T, n_iterations = 100, projection = 4210, model = 'random_cluster', progress = F)
+A.deli_bound.null <- boundary_null_distrib(A.delicatus, cat = T, n_iterations = 5, projection = 4210, model = 'random_cluster', progress = F)
 ```
 
 ### Run statistical tests
@@ -93,7 +93,7 @@ max_subgraph(A.delicatus, A.deli_bound.null, projection = 4210)
 overlap_null_distrib() runs much like boundary_null_distrib(), but takes raster surfaces for two traits (x and y), along with arguments for each trait.
 
 ```{r}
-A.deli_overlap.null <- overlap_null_distrib(A.delicatus, A.delicatus_ecoregion, x_cat = T, y_cat = T, n_iterations = 100, projection = 4210, x_model = 'random_cluster', y_model = 'random_cluster', progress = F)
+A.deli_overlap.null <- overlap_null_distrib(A.delicatus, A.delicatus_ecoregion, x_cat = T, y_cat = T, n_iterations = 5, projection = 4210, x_model = 'random_cluster', y_model = 'random_cluster', progress = F)
 ```
 
 ### Run statistical tests
