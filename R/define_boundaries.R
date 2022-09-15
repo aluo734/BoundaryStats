@@ -66,7 +66,7 @@ define_boundary <- function (x, threshold = 0.2, convert = F) {
     }
 
   # make raster with boundary elements (filter out cells with values below threshold)
-  boundaries <- as.matrix(x)
+  boundaries <- raster::as.matrix(x)
   for (row in 1:nrow(boundaries)) {
     for (col in 1:ncol(boundaries))
       if(!is.na(boundaries[row, col])) {
