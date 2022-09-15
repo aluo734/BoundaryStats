@@ -47,9 +47,9 @@ plot_boundary <- function(x, y, col = NA, trait_names = NA) {
   fill_col <- c('Trait 1' = '#6EC6CA', 'Trait 2' = '#CCABD8', 'Overlap' = '#055B5C')
   if (all(is.na(col))) {fill_col <- fill_col
   } else if (length(col) > 1) {
-    if(!is.na(col[1])) {fill_col[1] = col[1]}
-    if(!is.na(col[2])) {fill_col[2] = col[2]}
-    if(!is.na(col[3])) {fill_col[3] = col[3]}
+    if(!is.na(trait_names[1])) {fill_col[1] = trait_names[1]}
+    if(!is.na(trait_names[2])) {fill_col[2] = trait_names[2]}
+    if(!is.na(trait_names[3])) {fill_col[3] = trait_names[3]}
   }
 
   if(!is.na(trait_names[1])) {names(fill_col)[1] <- trait_names[1]}
