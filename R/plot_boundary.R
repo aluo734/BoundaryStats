@@ -26,8 +26,8 @@ plot_boundary <- function(x, y, color = NA, trait_names = NA) {
   colnames(y_layer) <- c('lon', 'lat', 'values')
 
   # make overlap layer
-  x_mat <- as.matrix(x)
-  y_mat <- as.matrix(y)
+  x_mat <- raster::as.matrix(x)
+  y_mat <- raster::as.matrix(y)
   overlap <- matrix(NA, nrow = nrow(x_mat), ncol = ncol(x_mat))
 
   for (row in 1:nrow(x_mat)) {
