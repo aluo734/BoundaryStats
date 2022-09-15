@@ -1,7 +1,7 @@
 
 # BoundaryStats
 
-BoundaryStats was designed to test for the presence geographic
+BoundaryStats was designed to test for the presence of geographic
 boundaries in ecological variables and overlap between such boundaries.
 Users can calculate boundary and boundary overlap statistics with raster
 data. BoundaryStats can create null distributions for the statistics
@@ -55,8 +55,7 @@ max_subgraph
 Boundary
 </td>
 <td style="text-align:left;">
-The length of the longest subgraph, or set of contiguous boundary
-elements.
+The length of the longest subgraph.
 </td>
 </tr>
 <tr>
@@ -67,7 +66,8 @@ Odirect
 Boundary Overlap
 </td>
 <td style="text-align:left;">
-The number of directly overlapping boundary elements of two traits.
+The number of directly overlapping boundary elements, or raster cells
+labelled as part of a boundary, of two traits.
 </td>
 </tr>
 <tr>

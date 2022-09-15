@@ -9,7 +9,7 @@ always_allow_html: yes
 
 # BoundaryStats
 
-BoundaryStats was designed to test for the presence geographic boundaries in ecological variables and overlap between such boundaries. Users can calculate boundary and boundary overlap statistics with raster data. BoundaryStats can create null distributions for the statistics based on various neutral landscape models that are parameterized on the empirical data. The primary functions are statistical tests for the presence of spatial boundaries of a variable and significant overlap between the spatial boundaries of two variables.
+BoundaryStats was designed to test for the presence of geographic boundaries in ecological variables and overlap between such boundaries. Users can calculate boundary and boundary overlap statistics with raster data. BoundaryStats can create null distributions for the statistics based on various neutral landscape models that are parameterized on the empirical data. The primary functions are statistical tests for the presence of spatial boundaries of a variable and significant overlap between the spatial boundaries of two variables.
 
 ## Installation
 
@@ -34,11 +34,11 @@ stat_functions[1,3] <- 'The number of subgraphs, or sets of contiguous boundary 
 
 stat_functions[2,1] <- 'max_subgraph'
 stat_functions[2,2] <- 'Boundary'
-stat_functions[2,3] <- 'The length of the longest subgraph, or set of contiguous boundary elements.'
+stat_functions[2,3] <- 'The length of the longest subgraph.'
 
 stat_functions[3,1] <- 'Odirect'
 stat_functions[3,2] <- 'Boundary Overlap'
-stat_functions[3,3] <- 'The number of directly overlapping boundary elements of two traits.'
+stat_functions[3,3] <- 'The number of directly overlapping boundary elements, or raster cells labelled as part of a boundary, of two traits.'
 
 stat_functions[4,1] <- 'Ox'
 stat_functions[4,2] <- 'Boundary Overlap'
