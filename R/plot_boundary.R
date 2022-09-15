@@ -6,7 +6,7 @@
 #'
 #' @param x A RasterLayer object with boundary elements.
 #' @param y A RasterLayer object with boundary elements.
-#' @param col Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).
+#' @param color Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).
 #' @param trait_names Optional. A character vector with up to two elements (legend name for x and legend name for y).
 #'
 #' @return A ggplot object.
@@ -16,7 +16,7 @@
 #'
 #' @author Amy Luo
 #' @export
-plot_boundary <- function(x, y, col = NA, trait_names = NA) {
+plot_boundary <- function(x, y, color = NA, trait_names = NA) {
   # prep boundary layers to plot
   x_layer <- raster::as.data.frame(x, xy = T, na.rm = T) %>%
     .[.[,3] != 0,]
@@ -45,11 +45,11 @@ plot_boundary <- function(x, y, col = NA, trait_names = NA) {
 
 # if there are inputs for colors and layer names, change the colors from default
   fill_col <- c('Trait 1' = '#6EC6CA', 'Trait 2' = '#CCABD8', 'Overlap' = '#055B5C')
-  if (all(is.na(col))) {fill_col <- fill_col
-  } else if (length(col) > 1) {
-    if(!is.na(trait_names[1])) {fill_col[1] = trait_names[1]}
-    if(!is.na(trait_names[2])) {fill_col[2] = trait_names[2]}
-    if(!is.na(trait_names[3])) {fill_col[3] = trait_names[3]}
+  if (all(is.na(color))) {fill_col <- fill_col
+  } else if (length(color) > 1) {
+    if(!is.na(color[1])) {fill_col[1] = color[1]}
+    if(!is.na(color[2])) {fill_col[2] = color[2]}
+    if(!is.na(color[3])) {fill_col[3] = color[3]}
   }
 
   if(!is.na(trait_names[1])) {names(fill_col)[1] <- trait_names[1]}

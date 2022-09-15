@@ -4,14 +4,14 @@
 \alias{plot_boundary}
 \title{Map the boundary elements of two raster layers}
 \usage{
-plot_boundary(x, y, col = NA, trait_names = NA)
+plot_boundary(x, y, color = NA, trait_names = NA)
 }
 \arguments{
 \item{x}{A RasterLayer object with boundary elements.}
 
 \item{y}{A RasterLayer object with boundary elements.}
 
-\item{col}{Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).}
+\item{color}{Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).}
 
 \item{trait_names}{Optional. A character vector with up to two elements (legend name for x and legend name for y).}
 }
