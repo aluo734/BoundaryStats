@@ -1,7 +1,7 @@
 Package: BoundaryStats
 Type: Package
 Title: Calculation of Boundary Overlap Statistics
-Version: 1.0.0
+Version: 1.0.1
 Author: Amy Luo
 Maintainer: Amy Luo <aluo@vols.utk.edu>
 Description: Functions to calculate boundary and boundary overlap statistics for

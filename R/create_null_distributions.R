@@ -18,9 +18,8 @@
 #' boundary elements. default = 0.2.
 #' @param n_iterations An integer indicating the number of iterations for the function. A value of 100 or 1000
 #' is recommended to produce sufficient resolution for downstream statistical tests. default = 10.
-#' @param x_model Neutral model to use for x. Options: 'random', 'gaussian_random' (Gaussian random field),
-#' 'autoregressive' (simultaneous autoregressive model), 'fractional_brownian' (fractional Brownian motion),
-#' and 'random_cluster' (modified random clusters method)
+#' @param x_model Neutral model to use. Options: 'random', 'gaussian_random' (Gaussian random field),
+#' 'autoregressive' (simultaneous autoregressive model), and 'random_cluster' (modified random clusters method)
 #' @param y_model Neutral model to use for y.
 #' @param projection Numeric. EPSG code of input raster layer.
 #' @param progress If progress = TRUE (default) a progress bar will be displayed.
