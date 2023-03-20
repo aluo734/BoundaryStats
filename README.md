@@ -1,4 +1,3 @@
-
 # BoundaryStats
 
 BoundaryStats was designed to test for the presence of geographic
@@ -9,6 +8,8 @@ based on various neutral landscape models that are parameterized on the
 empirical data. The primary functions are statistical tests for the
 presence of spatial boundaries of a variable and significant overlap
 between the spatial boundaries of two variables.
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7752875.svg)](https://doi.org/10.5281/zenodo.7752875)
 
 ## Installation
 
