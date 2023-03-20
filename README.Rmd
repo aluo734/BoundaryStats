@@ -6,10 +6,11 @@ editor_options:
   chunk_output_type: console
 always_allow_html: yes
 ---
-
 # BoundaryStats
 
 BoundaryStats was designed to test for the presence of geographic boundaries in ecological variables and overlap between such boundaries. Users can calculate boundary and boundary overlap statistics with raster data. BoundaryStats can create null distributions for the statistics based on various neutral landscape models that are parameterized on the empirical data. The primary functions are statistical tests for the presence of spatial boundaries of a variable and significant overlap between the spatial boundaries of two variables.
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7752875.svg)](https://doi.org/10.5281/zenodo.7752875)
 
 ## Installation
 
