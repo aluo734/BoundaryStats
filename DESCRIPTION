@@ -33,4 +33,4 @@ Depends:
   R (>= 4.1.0)
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
