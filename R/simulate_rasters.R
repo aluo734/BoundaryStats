@@ -186,6 +186,7 @@ simulate_rasters <- function (x, model, projection) {
     stop('null model not available')
   }
 
+  x_sim <- raster::resample(x_sim, x)
   raster::extent(x_sim) <- raster::extent(x)
   raster::crs(x_sim) <- paste0('+init=EPSG:', projection)
 
