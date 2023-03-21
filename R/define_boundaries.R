@@ -26,7 +26,11 @@
 #' @export
 define_boundary <- function (x, threshold = 0.2, convert = F) {
   # if the raster contains trait values, estimate first partial derivatives of the cells in lon and lat directions
-  if (convert == T) {x <- spatialEco::sobal(x)}
+  if (convert == T) {
+    x <- terra::rast(x) %>%
+      spatialEco::sobal(.) %>%
+      raster::raster(.)
+  }
 
   # sort the cell values from highest to lowest, then find the value above which only the threshold
   # proportion of cells would be kept
