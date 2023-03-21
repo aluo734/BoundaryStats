@@ -9,7 +9,7 @@ empirical data. The primary functions are statistical tests for the
 presence of spatial boundaries of a variable and significant overlap
 between the spatial boundaries of two variables.
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7752875.svg)](https://doi.org/10.5281/zenodo.7752875)
+[![DOI](https://zenodo.org/badge/534683960.svg)](https://zenodo.org/badge/latestdoi/534683960)
 
 ## Installation
 
