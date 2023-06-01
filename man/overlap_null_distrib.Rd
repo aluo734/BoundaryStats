@@ -7,6 +7,7 @@
 overlap_null_distrib(
   x,
   y,
+  rand_both,
   x_convert = F,
   y_convert = F,
   x_cat = F,
@@ -20,9 +21,11 @@ overlap_null_distrib(
 )
 }
 \arguments{
-\item{x}{A RasterLayer object.}
+\item{x}{A RasterLayer object. If rand_both = F, only this raster will be modeled.}
 
-\item{y}{A RasterLayer object.}
+\item{y}{A RasterLayer object. If rand_both = F, this raster does not change.}
+
+\item{rand_both}{TRUE if distribution of traits in x and y should be modeled.}
 
 \item{x_convert}{TRUE if x contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.}
 

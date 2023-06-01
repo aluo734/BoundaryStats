@@ -8,8 +8,9 @@
 #' functions for three boundary statistics (directly overlapping boundary elements, minimum distance
 #' between boundary elements in x to y, and minimum distance between elements in x and y).
 #'
-#' @param x A RasterLayer object.
-#' @param y A RasterLayer object.
+#' @param x A RasterLayer object. If rand_both = F, only this raster will be modeled.
+#' @param y A RasterLayer object. If rand_both = F, this raster does not change.
+#' @param rand_both TRUE if distribution of traits in x and y should be modeled.
 #' @param x_convert TRUE if x contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.
 #' @param y_convert TRUE if y contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.
 #' @param x_cat TRUE if x contains a categorical variable. default = FALSE.
@@ -39,40 +40,52 @@
 #' Jacquez, G.M., Maruca, I.S. & Fortin, M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
 #' James, P. M. A., Fleming, R.A., & Fortin, M.-J. (2010) Identifying significant scale-specific spatial boundaries using wavelets and null models: Spruce budworm defoliation in Ontario, Canada as a case study. Landscape Ecology, 6, 873-887.
 #' @export
-overlap_null_distrib <- function(x, y, x_convert = F, y_convert = F, x_cat = F, y_cat = F, threshold = 0.2,
+overlap_null_distrib <- function(x, y, rand_both, x_convert = F, y_convert = F, x_cat = F, y_cat = F, threshold = 0.2,
                                  n_iterations = 10, x_model = 'random', y_model = 'random', projection, progress = T) {
   # progress bar
   if (progress == T) {progress_bar = txtProgressBar(min = 0, max = n_iterations, initial = 0, char = '+', style = 3)}
 
   # make output vectors for repeat loop
   Odirect = c(); Ox = c(); Oxy = c()
+  
+  # if not randomizing x model, find boundaries in x
+  if (rand_both == F) {
+    if (y_cat == F) {
+      y_boundary <- define_boundary(y, threshold, y_convert)
+    } else {
+      y_boundary <- categorical_boundary(y, projection)
+    }
+  }
 
   # n iterations of random boundaries + stats
   rep = 0
   repeat {
-    # make two random rasters with boundary elements ----
+    
+    # make random rasters with boundary elements (only for x if not randomizing y) ----
     repeat {
       x_sim <- simulate_rasters(x, x_model, projection)
-
+      
       if (x_cat == F) {
         x_boundary <- define_boundary(x_sim, threshold, x_convert)
       } else {
         x_boundary <- categorical_boundary(x_sim, projection)
       }
-
+      
       if (sum(x_boundary@data@values == 1, na.rm = T) >= 1) {break}
     }
 
-    repeat {
-      y_sim <- simulate_rasters(y, y_model, projection)
-
-      if (y_cat == F) {
-        y_boundary <- define_boundary(y_sim, threshold, y_convert)
-      } else {
-        y_boundary <- categorical_boundary(y_sim, projection)
+    if (rand_both == T) {
+      repeat {
+        y_sim <- simulate_rasters(y, y_model, projection)
+        
+        if (y_cat == F) {
+          y_boundary <- define_boundary(y_sim, threshold, y_convert)
+        } else {
+          y_boundary <- categorical_boundary(y_sim, projection)
+        }
+        
+        if (sum(y_boundary@data@values == 1, na.rm = T) >= 1) {break}
       }
-
-      if (sum(y_boundary@data@values == 1, na.rm = T) >= 1) {break}
     }
 
     # make matrices to calculate stats ----
