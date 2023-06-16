@@ -119,7 +119,7 @@ A.delicatus <- crop(A.delicatus, A.delicatus_ecoregion) %>%
   mask(., A.delicatus_ecoregion)
 A.delicatus <- categorical_boundary(A.delicatus, projection = 4210)
 
-overlap.null <- overlap_null_distrib(A.delicatus, A.delicatus_ecoregion, x_cat = T, y_cat = T, n_iterations = 100, projection = 4210, x_model = 'random_cluster', y_model = 'random_cluster')
+A.deli_overlap.null <- overlap_null_distrib(A.delicatus, A.delicatus_ecoregion, rand_both = F, x_cat = T, n_iterations = 100, projection = 4210, x_model = 'random_cluster')
 
 Odirect(A.delicatus, A.delicatus_ecoregion, overlap.null)
 Ox(A.delicatus, A.delicatus_ecoregion, overlap.null)
