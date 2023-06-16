@@ -44,133 +44,136 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = F, y_convert = F, 
                                  n_iterations = 10, x_model = 'random', y_model = 'random', projection, progress = T) {
   # progress bar
   if (progress == T) {progress_bar = txtProgressBar(min = 0, max = n_iterations, initial = 0, char = '+', style = 3)}
-
-  # make output vectors for repeat loop
-  Odirect = c(); Ox = c(); Oxy = c()
   
-  # if not randomizing x model, find boundaries in x
-  if (rand_both == F) {
-    if (y_cat == F) {
-      y_boundary <- define_boundary(y, threshold, y_convert)
-    } else {
-      y_boundary <- categorical_boundary(y, projection)
-    }
-  }
-
-  # n iterations of random boundaries + stats
-  rep = 0
-  repeat {
+  suppressWarnings({
+    # make output vectors for repeat loop
+    Odirect = c(); Ox = c(); Oxy = c()
     
-    # make random rasters with boundary elements (only for x if not randomizing y) ----
-    repeat {
-      x_sim <- simulate_rasters(x, x_model, projection)
-      
-      if (x_cat == F) {
-        x_boundary <- define_boundary(x_sim, threshold, x_convert)
+    # if not randomizing x model, find boundaries in x
+    if (rand_both == F) {
+      if (y_cat == F) {
+        y_boundary <- define_boundary(y, threshold, y_convert)
       } else {
-        x_boundary <- categorical_boundary(x_sim, projection)
+        y_boundary <- categorical_boundary(y, projection)
+      }
+    }
+    
+    # n iterations of random boundaries + stats
+    rep = 0
+    repeat {
+      
+      # make random rasters with boundary elements (only for x if not randomizing y) ----
+      repeat {
+        x_sim <- simulate_rasters(x, x_model, projection)
+        
+        if (x_cat == F) {
+          x_boundary <- define_boundary(x_sim, threshold, x_convert)
+        } else {
+          x_boundary <- categorical_boundary(x_sim, projection)
+        }
+        
+        if (sum(x_boundary@data@values == 1, na.rm = T) >= 1) {break}
       }
       
-      if (sum(x_boundary@data@values == 1, na.rm = T) >= 1) {break}
-    }
-
-    if (rand_both == T) {
-      repeat {
-        y_sim <- simulate_rasters(y, y_model, projection)
-        
-        if (y_cat == F) {
-          y_boundary <- define_boundary(y_sim, threshold, y_convert)
-        } else {
-          y_boundary <- categorical_boundary(y_sim, projection)
-        }
-        
-        if (sum(y_boundary@data@values == 1, na.rm = T) >= 1) {break}
-      }
-    }
-
-    # make matrices to calculate stats ----
-    x_mat <- raster::as.matrix(x_boundary)
-    y_mat <- raster::as.matrix(y_boundary)
-
-    # direct overlap statistic ----
-    count = 0
-    for (row in 1:nrow(x_mat)) {
-      for (col in 1:ncol(x_mat)) {
-        if (!is.na(x_mat[row, col]) & !is.na(y_mat[row, col])) {
-          if (x_mat[row, col] == 1 & y_mat[row, col] == 1) {count = count + 1}
+      if (rand_both == T) {
+        repeat {
+          y_sim <- simulate_rasters(y, y_model, projection)
+          
+          if (y_cat == F) {
+            y_boundary <- define_boundary(y_sim, threshold, y_convert)
+          } else {
+            y_boundary <- categorical_boundary(y_sim, projection)
+          }
+          
+          if (sum(y_boundary@data@values == 1, na.rm = T) >= 1) {break}
         }
       }
-    }
-
-    Odirect <- append(Odirect, count)
-
-    # average minimum distance statistic (Ox; one boundary influences the other) ----
-    min_distances <- c()
-    y_present <- which(y_mat == 1, arr.ind = T)
-
-    for (row in 1:nrow(x_mat)) {
-      for (col in 1:ncol(x_mat)) {
-        if (!is.na(x_mat[row, col])) {
-          if (x_mat[row, col] == 1) {
-            distances <- matrix(nrow = nrow(y_present))
-            for (i in 1:length(distances)) {distances[i] <- sqrt((y_present[i, 1] - row)^2 + (y_present[i, 2] - col)^2)}
-            min_distances <- append(min_distances, min(distances))
+      
+      # make matrices to calculate stats ----
+      x_mat <- raster::as.matrix(x_boundary)
+      y_mat <- raster::as.matrix(y_boundary)
+      
+      # direct overlap statistic ----
+      count = 0
+      for (row in 1:nrow(x_mat)) {
+        for (col in 1:ncol(x_mat)) {
+          if (!is.na(x_mat[row, col]) & !is.na(y_mat[row, col])) {
+            if (x_mat[row, col] == 1 & y_mat[row, col] == 1) {count = count + 1}
           }
         }
       }
-    }
-
-    Ox <- mean(min_distances) %>%
-      append(Ox, .)
-
-    # average minimum distance statistic (Oxy; both boundaries influence each other) ----
-    min_distances <- c()
-    x_present <- which(x_mat == 1, arr.ind = T)
-
-    for (row in 1:nrow(x_mat)) {
-      for (col in 1:ncol(x_mat)) {
-        if (!is.na(x_mat[row, col])) {
-          if (x_mat[row, col] == 1) {
-            distances <- matrix(nrow = nrow(y_present))
-            for (i in 1:length(distances)) {distances[i] <- sqrt((y_present[i, 1] - row)^2 + (y_present[i, 2] - col)^2)}
-            min_distances <- append(min_distances, min(distances))
+      
+      Odirect <- append(Odirect, count)
+      
+      # average minimum distance statistic (Ox; one boundary influences the other) ----
+      min_distances <- c()
+      y_present <- which(y_mat == 1, arr.ind = T)
+      
+      for (row in 1:nrow(x_mat)) {
+        for (col in 1:ncol(x_mat)) {
+          if (!is.na(x_mat[row, col])) {
+            if (x_mat[row, col] == 1) {
+              distances <- matrix(nrow = nrow(y_present))
+              for (i in 1:length(distances)) {distances[i] <- sqrt((y_present[i, 1] - row)^2 + (y_present[i, 2] - col)^2)}
+              min_distances <- append(min_distances, min(distances))
+            }
           }
         }
       }
-    }
-
-    for (row in 1:nrow(y_mat)) {
-      for (col in 1:ncol(y_mat)) {
-        if (!is.na(y_mat[row, col])) {
-          if (y_mat[row, col] == 1) {
-            distances <- matrix(nrow = nrow(x_present))
-            for (i in 1:length(distances)) {distances[i] <- sqrt((x_present[i, 1] - row)^2 + (x_present[i, 2] - col)^2)}
-            min_distances <- append(min_distances, min(distances))
+      
+      Ox <- mean(min_distances) %>%
+        append(Ox, .)
+      
+      # average minimum distance statistic (Oxy; both boundaries influence each other) ----
+      min_distances <- c()
+      x_present <- which(x_mat == 1, arr.ind = T)
+      
+      for (row in 1:nrow(x_mat)) {
+        for (col in 1:ncol(x_mat)) {
+          if (!is.na(x_mat[row, col])) {
+            if (x_mat[row, col] == 1) {
+              distances <- matrix(nrow = nrow(y_present))
+              for (i in 1:length(distances)) {distances[i] <- sqrt((y_present[i, 1] - row)^2 + (y_present[i, 2] - col)^2)}
+              min_distances <- append(min_distances, min(distances))
+            }
           }
         }
       }
+      
+      for (row in 1:nrow(y_mat)) {
+        for (col in 1:ncol(y_mat)) {
+          if (!is.na(y_mat[row, col])) {
+            if (y_mat[row, col] == 1) {
+              distances <- matrix(nrow = nrow(x_present))
+              for (i in 1:length(distances)) {distances[i] <- sqrt((x_present[i, 1] - row)^2 + (x_present[i, 2] - col)^2)}
+              min_distances <- append(min_distances, min(distances))
+            }
+          }
+        }
+      }
+      
+      Oxy <- mean(min_distances) %>%
+        append(Oxy, .)
+      
+      # loop count and break ----
+      rep = rep + 1
+      if (progress == T) {setTxtProgressBar(progress_bar, rep)}
+      if (rep >= n_iterations) {
+        if (progress == T) {close(progress_bar)}
+        break
+      }
     }
-
-    Oxy <- mean(min_distances) %>%
-      append(Oxy, .)
-
-    # loop count and break ----
-    rep = rep + 1
-    if (progress == T) {setTxtProgressBar(progress_bar, rep)}
-    if (rep >= n_iterations) {
-      if (progress == T) {close(progress_bar)}
-      break
-    }
-  }
-
-  # output
-  Odirect <- pdqr::new_p(Odirect, type = 'continuous')
-  Ox <- pdqr::new_p(Ox, type = 'continuous')
-  Oxy <- pdqr::new_p(Oxy, type = 'continuous')
-  distribs <- list(Odirect, Ox, Oxy)
-  names(distribs) <- c('Odirect', 'Ox', 'Oxy')
-
-  cat('DONE')
+    
+    # output
+    Odirect <- pdqr::new_p(Odirect, type = 'continuous')
+    Ox <- pdqr::new_p(Ox, type = 'continuous')
+    Oxy <- pdqr::new_p(Oxy, type = 'continuous')
+    distribs <- list(Odirect, Ox, Oxy)
+    names(distribs) <- c('Odirect', 'Ox', 'Oxy')
+    
+    cat('DONE')
+  })
+  
   return(distribs)
 
 }
@@ -217,75 +220,76 @@ boundary_null_distrib <- function(x, convert = F, cat = F, threshold = 0.2, n_it
   # progress bar
   if (progress == T) {progress_bar = txtProgressBar(min = 0, max = n_iterations, initial = 0, char = '+', style = 3)}
 
-  # make output vectors for repeat loop
-  n_subgraph = c(); longest_subgraph = c()
-
-  # n iterations of random boundaries + stats
-  rep = 0
-  repeat {
-    # simulate random raster with boundary elements ----
+  suppressWarnings({
+    # make output vectors for repeat loop
+    n_subgraph = c(); longest_subgraph = c()
+    
+    # n iterations of random boundaries + stats
+    rep = 0
     repeat {
-      x_sim <- simulate_rasters(x, model, projection)
-
-      if (cat == F) {
-        x_boundary <- define_boundary(x_sim, threshold, convert)
-      } else {
-        x_boundary <- categorical_boundary(x_sim, projection)
+      # simulate random raster with boundary elements ----
+      repeat {
+        x_sim <- simulate_rasters(x, model, projection)
+        
+        if (cat == F) {
+          x_boundary <- define_boundary(x_sim, threshold, convert)
+        } else {
+          x_boundary <- categorical_boundary(x_sim, projection)
+        }
+        
+        if (sum(x_boundary@data@values == 1, na.rm = T) >= 1) {break}
       }
-
-      if (sum(x_boundary@data@values == 1, na.rm = T) >= 1) {break}
-    }
-
-    # number of subgraphs ----
-    x_subgraphs <- raster::clump(x_boundary)
-    n_subgraph = max(x_subgraphs@data@values, na.rm = T)
-
-    # maximum length of a subgraph ----
-    for (row in 1:nrow(x_boundary)) {
-      for (col in 1:ncol(x_boundary)) {
-        if(!is.na(x_boundary[row, col])) {
-          if (x_boundary[row, col] == 0) {x_boundary[row, col] = NA}
+      
+      # number of subgraphs ----
+      x_subgraphs <- raster::clump(x_boundary)
+      n_subgraph = max(x_subgraphs@data@values, na.rm = T)
+      
+      # maximum length of a subgraph ----
+      for (row in 1:nrow(x_boundary)) {
+        for (col in 1:ncol(x_boundary)) {
+          if(!is.na(x_boundary[row, col])) {
+            if (x_boundary[row, col] == 0) {x_boundary[row, col] = NA}
+          }
         }
       }
+      
+      xpolygon <- raster::rasterToPolygons(x_boundary, na.rm = T) %>%
+        .[.@data$layer == 1,]
+      raster::crs(xpolygon) <- paste0('+init=EPSG:', 4210)
+      xpolygon <- terra::buffer(xpolygon, width = 0.001, dissolve = T) %>%
+        sf::st_as_sf(.)
+      
+      lengths <- c()
+      for (i in 1:nrow(xpolygon)) {
+        lengths <- sf::st_geometry(xpolygon[i,]) %>%
+          sf::st_cast(., 'POINT') %>%
+          sf::st_distance(.) %>%
+          max(.) %>%
+          append(lengths, .) %>%
+          as.numeric(.)
+      }
+      
+      longest_subgraph <- max(lengths) %>%
+        append(longest_subgraph, .)
+      
+      # loop count and break ----
+      rep = rep + 1
+      if (progress == T) {setTxtProgressBar(progress_bar, rep)}
+      if (rep >= n_iterations) {
+        if (progress == T) {close(progress_bar)}
+        break
+      }
     }
-
-    xpolygon <- raster::rasterToPolygons(x_boundary, na.rm = T, dissolve = T)
-    raster::crs(xpolygon) <- paste0('+init=EPSG:', projection)
-    xpolygon <-
-      sp::disaggregate(xpolygon) %>%
-      terra::buffer(., width = 0.001, dissolve = T) %>%
-      sp::disaggregate(.) %>%
-      sf::st_as_sf(xpolygon)
-
-    lengths <- c()
-    for (i in 1:nrow(xpolygon)) {
-      lengths <- sf::st_geometry(xpolygon[i,]) %>%
-        sf::st_cast(., 'POINT') %>%
-        sf::st_distance(.) %>%
-        max(.) %>%
-        append(lengths, .) %>%
-        as.numeric(.)
-    }
-
-    longest_subgraph <- max(lengths) %>%
-      append(longest_subgraph, .)
-
-    # loop count and break ----
-    rep = rep + 1
-    if (progress == T) {setTxtProgressBar(progress_bar, rep)}
-    if (rep >= n_iterations) {
-      if (progress == T) {close(progress_bar)}
-      break
-    }
-  }
-
-  # output
-  n_subgraph <- pdqr::new_p(n_subgraph, type = 'continuous')
-  longest_subgraph <- pdqr::new_p(longest_subgraph, type = 'continuous')
-  distribs <- list(n_subgraph, longest_subgraph)
-  names(distribs) <- c('n_subgraph', 'longest_subgraph')
-
-  cat('DONE')
+    
+    # output
+    n_subgraph <- pdqr::new_p(n_subgraph, type = 'continuous')
+    longest_subgraph <- pdqr::new_p(longest_subgraph, type = 'continuous')
+    distribs <- list(n_subgraph, longest_subgraph)
+    names(distribs) <- c('n_subgraph', 'longest_subgraph')
+    
+    cat('DONE')
+  })
+  
   return(distribs)
 
 }

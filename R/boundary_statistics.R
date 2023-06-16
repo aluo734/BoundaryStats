@@ -73,10 +73,10 @@ max_subgraph <- function(x, null_distrib, projection) {
   x_boundary <- raster::raster(x_mat)
   raster::extent(x_boundary) <- raster::extent(x)
   terra::crs(x_boundary) <- paste0('+init=epsg:', projection)
-  xpolygon <- raster::rasterToPolygons(x_boundary, na.rm = T, dissolve = T) %>%
-    sp::disaggregate(.) %>%
-    terra::buffer(., width = 0.001, dissolve = T) %>%
-    sp::disaggregate(.) %>%
+  xpolygon <- raster::rasterToPolygons(x_boundary, na.rm = T) %>%
+    .[.@data$layer == 1,]
+  raster::crs(xpolygon) <- paste0('+init=EPSG:', 4210)
+  xpolygon <- terra::buffer(xpolygon, width = 0.001, dissolve = T) %>%
     sf::st_as_sf(.)
 
   # calculate the lengths of the subgraphs and keep the longest length
