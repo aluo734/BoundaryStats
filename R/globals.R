@@ -1,9 +1,9 @@
-#' @importFrom stats na.omit rnorm
-#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom stats na.omit rnorm median
+#' @importFrom utils setTxtProgressBar txtProgressBar head capture.output
 #' @importFrom methods is
 #' @importFrom magrittr %>%
 #' @import igraph
 NULL
 
 #' @importFrom utils globalVariables
-utils::globalVariables(c('.', 'lon', 'lat', 'value'))
+utils::globalVariables(c('.', 'lon', 'lat'))

@@ -7,9 +7,9 @@
 Ox(x, y, null_distrib)
 }
 \arguments{
-\item{x}{A RasterLayer object with boundary elements.}
+\item{x}{A SpatRaster object with boundary elements.}
 
-\item{y}{A RasterLayer object with boundary elements.}
+\item{y}{A SpatRaster object with boundary elements.}
 
 \item{null_distrib}{A list of probability functions output from overlap_null_distrib().}
 }
@@ -22,15 +22,22 @@ and the nearest boundary element in raster y. Uses Euclidean distance. The bound
 trait x depend on the boundaries of trait y.
 }
 \examples{
-soil_raster <- raster('soil_types.asc')
-genetic_raster <- raster('genetic_assignment_probabilities.asc')
+\dontrun{
+data(T.cristatus)
+T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+terra::ext(T.cristatus) <- T.cristatus_ext
 
-overlap_null_distribs <- overlap_null_distrib(soil_raster, genetic_raster, n_iterations = 1000,
-                                              y_convert = T, threshold = 0.1, projection = 4326)
-soil_boundaries <- define_boundary(soil_raster)
-genetic_boundaries <- define_boundary(genetic_raster)
+data(grassland)
+grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+terra::ext(grassland) <- grassland_ext
 
-Ox(soil_boundary, genetic_boundary, overlap_null_distribs)
+Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE,
+  x_cat = TRUE, n_iterations = 100, x_model = 'random_cluster')
+Tcrist_boundaries <- categorical_boundary(T.cristatus)
+grassland_boundaries <- define_boundary(grassland, 0.1)
+
+Ox(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+}
 
 }
 \references{

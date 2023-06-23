@@ -1,76 +1,72 @@
-# define boundary with numeric data ----
 #' @name define_boundary
-#' @title Define the boundary elements of a RasterLayer with numeric data or boundary intensities
+#' @title Define the boundary elements of a SpatRaster with numeric data or boundary intensities
 #' @description
 #'
-#' Defines boundaries in a RasterLayer object by keeping a proportion of the cells with the highest
-#' boundary intensity values. If the RasterLayer contains trait values, the values can be converted
-#' to boundary values (convert = T) using a sobel operator.
+#' Defines boundaries in a SpatRaster object by keeping a proportion of the cells with the highest
+#' boundary intensity values. If the SpatRaster contains trait values, the values can be converted
+#' to boundary/edge values (convert = T) using a Sobel-Feldman operator.
 #'
-#' @param x A RasterLayer object.
+#' @param x A SpatRaster object.
 #' @param threshold A value between 0 and 1. The proportion of cells to keep as boundary elements. default = 0.2.
 #' @param convert logical. If TRUE, convert values of each cell from trait values to boundary intensities. default = FALSE.
 #'
-#' @return A RasterLayer object with cell values 1 for boundary elements and 0 for other cells
-#' @examples
-#' genetic_assignments <- raster('genetic_assignments.asc')
-#' genetic_boundary <- define_boundary(genetic_assignments, threshold = 0.2, convert = T)
-#'
-#' genetic_boundary <- raster('genetic_boundary.asc')
-#' genetic_boundary <- define_boundary(genetic_boundary, threshold = 0.1, convert = F)
-#'
+#' @return A SpatRaster object with cell values 1 for boundary elements and 0 for other cells
+#' @examples \dontrun{
+#' data(grassland)
+#' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+#' terra::ext(grassland) <- grassland_ext
+#' 
+#' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' }
+#' 
 #' @author Amy Luo
 #' @references
 #' Fortin, M.J. et al. (2000) Issues related to the detection of boundaries. Landscape Ecology, 15, 453-466.
 #' Jacquez, G.M., Maruca,I S. & Fortin M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
 #' @export
-define_boundary <- function (x, threshold = 0.2, convert = F) {
+define_boundary <- function (x, threshold = 0.2, convert = FALSE) {
   # if the raster contains trait values, estimate first partial derivatives of the cells in lon and lat directions
-  if (convert == T) {
-    x <- terra::rast(x) %>%
-      spatialEco::sobal(.) %>%
-      raster::raster(.)
-  }
+  if (convert == TRUE) {x <- sobel_operator(x)}
 
   # sort the cell values from highest to lowest, then find the value above which only the threshold
   # proportion of cells would be kept
-  threshold_value <- raster::values(x) %>%
+  threshold_value <- terra::values(x) %>%
     na.omit(.) %>%
-    sort(., decreasing = T) %>%
-    utils::head(., round(length(.) * threshold)) %>%
+    sort(., decreasing = TRUE) %>%
+    head(., round(length(.) * threshold)) %>%
     min(.)
 
   # Check proportion of cells above threshold value. Sometimes there are a lot of redundant cell values, so if there
   # are redundancies at the threshold value, then the proportion of cells kept will be higher than the threshold.
-  prop <- raster::values(x) %>%
+  prop <- terra::values(x, dataframe = TRUE) %>%
     na.omit(.) %>%
     .[. >= threshold_value] %>%
-    length(.)/length(na.omit(raster::values(x)))
+    length(.)/length(na.omit(terra::values(x)))
 
   # so we'll keep reducing the threshold value until the proportion of cells kept is below the threshold
   if (threshold_value %% 1 == 0) {                # sometimes the boundary values are integers
     while (prop > threshold) {
       threshold_value = threshold_value + 1       # so increase the threshold value by 1
-      prop <- raster::values(x) %>%
+      prop <- terra::values(x) %>%
         na.omit(.) %>%
         .[. >= threshold_value] %>%
-        length(.)/length(na.omit(raster::values(x)))
+        length(.)/length(na.omit(terra::values(x)))
       }
     } else {                                      # sometimes the boundary values are float
     rep = 0
     while (prop > threshold) {
       threshold_value = threshold_value * 1.1     # so increase the threshold value by 10%
-      prop <- raster::values(x) %>%               # until the proportion of cells kept < threshold
+      prop <- terra::values(x, dataframe = TRUE) %>%               # until the proportion of cells kept < threshold
         na.omit(.) %>%
         .[. >= threshold_value] %>%
-        length(.)/length(na.omit(raster::values(x)))
+        length(.)/length(na.omit(terra::values(x)))
       rep = rep + 1
       if (rep >= 10) {break}                      # break after 10 reps if it gets that far
       }
     }
 
   # make raster with boundary elements (filter out cells with values below threshold)
-  boundaries <- raster::as.matrix(x)
+  boundaries <- terra::as.matrix(x, wide = T)
   for (row in 1:nrow(boundaries)) {
     for (col in 1:ncol(boundaries))
       if(!is.na(boundaries[row, col])) {
@@ -104,41 +100,8 @@ define_boundary <- function (x, threshold = 0.2, convert = F) {
     }
   }
 
-  boundaries <- raster::raster(boundaries)
-  raster::extent(boundaries) <- raster::extent(x)
+  boundaries <- terra::rast(boundaries)
+  terra::ext(boundaries) <- terra::ext(x)
   return(boundaries)
 
-}
-
-# define boundary with categorical data ----
-#' @name categorical_boundary
-#' @title Define the boundary elements of a RasterLayer with categorical data
-#' @description Creates boundary element cells where patches of two categories meet.
-#'
-#' @param x A Rasterlayer object.
-#' @param projection Numeric. The EPSG code of the input layer CRS.
-#'
-#' @return A RasterLayer object with cell values 1 for boundary elements and 0 for other cells
-#' @examples
-#' soil_boundaries <- categorical_boundary(soil_type_raster, projection = 4326)
-#'
-#' @author Amy Luo
-#' @export
-categorical_boundary <- function(x, projection) {
-  x_poly <- terra::rast(x) %>%
-    terra::as.polygons(.)
-  mask <- terra::aggregate(x_poly) %>%
-    terra::as.lines(.) %>%
-    terra::rasterize(., terra::rast(x))
-  fill <- terra::aggregate(x_poly) %>%
-    terra::rasterize(., terra::rast(x), field = 0)
-
-  x_boundary <- terra::as.lines(x_poly) %>%
-    terra::rasterize(., terra::rast(x)) %>%
-    terra::merge(., fill) %>%
-    terra::mask(., mask, maskvalues = 1, updatevalue = 0) %>%
-    raster::raster(.)
-
-  raster::crs(x_boundary) <- paste('+init=epsg:', projection, sep = '')
-  return(x_boundary)
 }
