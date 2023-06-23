@@ -6,4 +6,4 @@
 NULL
 
 #' @importFrom utils globalVariables
-utils::globalVariables(c('.', 'lon', 'lat'))
+utils::globalVariables(c('.', 'long', 'lat', 'region'))
