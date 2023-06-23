@@ -16,14 +16,13 @@ plot_boundary(x, y, color = NA, trait_names = NA)
 \item{trait_names}{Optional. A character vector with up to two elements (legend name for x and legend name for y).}
 }
 \value{
-A ggplot object.
+A ggplot2 object.
 }
 \description{
 This is a wrapper function for ggplot2 that will produce a map of boundary
 elements for two traits and show where boundary elements intersect.
 }
 \examples{
-\dontrun{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 terra::ext(T.cristatus) <- T.cristatus_ext
@@ -36,7 +35,6 @@ Tcrist_boundaries <- categorical_boundary(T.cristatus)
 grassland_boundaries <- define_boundary(grassland, 0.1)
 
 plot_boundary(Tcrist_boundaries, grassland_boundaries)
-}
 
 }
 \author{

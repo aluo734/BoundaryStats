@@ -1,11 +1,19 @@
 #' @name random_raster_sim
-#' @title Simulates random raster with boundary elements.
-#' @description Internal function that simulates a random raster of the same extent and resolution as
-#' the input raster using a neutral model.
+#' @title Stochastic neutral landscape model
+#' @description Simulates a spatially stochastic neutral landscape of the same extent and resolution as the input
+#' raster, with the same distribution of values.
 #'
 #' @param x A SpatRaster object.
 #' @return A SpatRaster object with boundary elements.
-#'
+#' 
+#' @examples
+#' data(grassland)
+#' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+#' terra::ext(grassland) <- grassland_ext
+#' 
+#' simulation <- random_raster_sim(grassland)
+#' terra::plot(simulation)
+#' 
 #' @author Amy Luo
 #' @references
 #' James, P. M. A., Fleming, R.A., & Fortin, M.-J. (2010) Identifying significant scale-specific spatial boundaries using wavelets and null models: Spruce budworm defoliation in Ontario, Canada as a case study. Landscape Ecology, 6, 873-887.

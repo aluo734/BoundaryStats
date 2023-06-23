@@ -2,7 +2,7 @@
 % Please edit documentation in R/gauss_random_field_sim.R
 \name{gauss_random_field_sim}
 \alias{gauss_random_field_sim}
-\title{Simulates a Gaussian random field raster with boundary elements.}
+\title{Gaussian random field neutral model}
 \usage{
 gauss_random_field_sim(x)
 }
@@ -13,8 +13,17 @@ gauss_random_field_sim(x)
 A SpatRaster object with boundary elements.
 }
 \description{
-Internal function that simulates a raster of the same extent and resolution as
-the input raster using a neutral model.
+Simulates a gaussian random field as a neutral landscape of the same extent and resolution as the
+input raster, using the same spatial autocorrelation range as the input
+}
+\examples{
+data(grassland)
+grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+terra::ext(grassland) <- grassland_ext
+
+simulation <- gauss_random_field_sim(grassland)
+terra::plot(simulation)
+
 }
 \references{
 James, P. M. A., Fleming, R.A., & Fortin, M.-J. (2010) Identifying significant scale-specific spatial boundaries using wavelets and null models: Spruce budworm defoliation in Ontario, Canada as a case study. Landscape Ecology, 6, 873-887.

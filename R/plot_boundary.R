@@ -9,8 +9,9 @@
 #' @param color Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).
 #' @param trait_names Optional. A character vector with up to two elements (legend name for x and legend name for y).
 #'
-#' @return A ggplot object.
-#' @examples \dontrun{
+#' @return A ggplot2 object.
+#' 
+#' @examples
 #' data(T.cristatus)
 #' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 #' terra::ext(T.cristatus) <- T.cristatus_ext
@@ -23,7 +24,6 @@
 #' grassland_boundaries <- define_boundary(grassland, 0.1)
 #'
 #' plot_boundary(Tcrist_boundaries, grassland_boundaries)
-#' }
 #'
 #' @author Amy Luo
 #' @export

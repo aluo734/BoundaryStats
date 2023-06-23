@@ -1,11 +1,18 @@
 #' @name gauss_random_field_sim
-#' @title Simulates a Gaussian random field raster with boundary elements.
-#' @description Internal function that simulates a raster of the same extent and resolution as
-#' the input raster using a neutral model.
+#' @title Gaussian random field neutral model
+#' @description Simulates a gaussian random field as a neutral landscape of the same extent and resolution as the
+#' input raster, using the same spatial autocorrelation range as the input
 #'
 #' @param x A SpatRaster object.
-#'
 #' @return A SpatRaster object with boundary elements.
+#' 
+#' @examples
+#' data(grassland)
+#' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+#' terra::ext(grassland) <- grassland_ext
+#' 
+#' simulation <- gauss_random_field_sim(grassland)
+#' terra::plot(simulation)
 #'
 #' @author Amy Luo
 #' @references

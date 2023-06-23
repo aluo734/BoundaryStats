@@ -2,7 +2,7 @@
 % Please edit documentation in R/mod_random_clust_sim.R
 \name{mod_random_clust_sim}
 \alias{mod_random_clust_sim}
-\title{Simulates raster using modified random clusters with boundary elements.}
+\title{Modified random cluster neutral landscape model}
 \usage{
 mod_random_clust_sim(x)
 }
@@ -13,8 +13,17 @@ mod_random_clust_sim(x)
 A SpatRaster object with boundary elements.
 }
 \description{
-Internal function that simulates a  raster of the same extent and resolution as
-the input raster using a neutral model.
+Simulates a neutral landscape of the same extent and resolution as the input raster, with the same
+distribution of values.
+}
+\examples{
+data(grassland)
+grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+terra::ext(grassland) <- grassland_ext
+
+simulation <- mod_random_clust_sim(grassland)
+terra::plot(simulation)
+
 }
 \references{
 Saura, S. & Martínez-Millán, J. (2000) Landscape patterns simulation with a modified random clusters method. Landscape Ecology, 15, 661 – 678.

@@ -7,7 +7,7 @@
 #' @param null_distrib A list of probability functions output from boundary_null_distrib().
 #'
 #' @return The number of subgraphs in the raster and a p-value.
-#' @examples \dontrun{
+#' @examples \donttest{
 #' data(T.cristatus)
 #' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 #' terra::ext(T.cristatus) <- T.cristatus_ext
@@ -45,7 +45,7 @@ n_subgraph <- function(x, null_distrib) {
 #' @param null_distrib A list of probability functions output from boundary_null_distrib().
 #'
 #' @return The length of the longest subgraph and a p-value.
-#' @examples \dontrun{
+#' @examples \donttest{
 #' data(T.cristatus)
 #' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 #' terra::ext(T.cristatus) <- T.cristatus_ext

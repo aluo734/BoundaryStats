@@ -18,7 +18,7 @@ The length of the longest subgraph and a p-value.
 Statistical test for the length of the longest subgraph, or set of contiguous boundary elements.
 }
 \examples{
-\dontrun{
+\donttest{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 terra::ext(T.cristatus) <- T.cristatus_ext

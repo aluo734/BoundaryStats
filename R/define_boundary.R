@@ -11,13 +11,13 @@
 #' @param convert logical. If TRUE, convert values of each cell from trait values to boundary intensities. default = FALSE.
 #'
 #' @return A SpatRaster object with cell values 1 for boundary elements and 0 for other cells
-#' @examples \dontrun{
+#' 
+#' @examples
 #' data(grassland)
 #' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 #' terra::ext(grassland) <- grassland_ext
 #' 
 #' grassland_boundaries <- define_boundary(grassland, 0.1)
-#' }
 #' 
 #' @author Amy Luo
 #' @references

@@ -22,7 +22,7 @@ and the nearest boundary element in raster y. Uses Euclidean distance. The bound
 trait x depend on the boundaries of trait y.
 }
 \examples{
-\dontrun{
+\donttest{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 terra::ext(T.cristatus) <- T.cristatus_ext

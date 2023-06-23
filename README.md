@@ -129,4 +129,4 @@ Oxy(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
 Data source: Cox, Karen; Schepers, Robbert; Van Breusegem, An;
 Speybroeck, Jeroen (2023), The common ground in landscape effects on
 gene flow in two newt species in an agroecosystem, Dryad, Dataset,
-<https://doi.org/10.5061/dryad.bk3j9kdhz>
+<https://doi.org/10.5061/dryad.bk3j9kdhz>.

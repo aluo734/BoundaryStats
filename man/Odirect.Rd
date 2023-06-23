@@ -20,7 +20,7 @@ The number of directly overlapping boundary elements and a p-value.
 Statistical test for the number of directly overlapping boundary elements of two traits.
 }
 \examples{
-\dontrun{
+\donttest{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 terra::ext(T.cristatus) <- T.cristatus_ext
