@@ -17,7 +17,6 @@ Imports:
   sf,
   terra,
   pdqr,
-  rnaturalearth,
   methods,
   ggplot2,
   tibble,

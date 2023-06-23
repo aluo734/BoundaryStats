@@ -14,14 +14,14 @@
 #' data(T.cristatus)
 #' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 #' terra::ext(T.cristatus) <- T.cristatus_ext
-#' 
+#'
 #' data(grassland)
 #' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 #' terra::ext(grassland) <- grassland_ext
-#' 
+#'
 #' Tcrist_boundaries <- categorical_boundary(T.cristatus)
 #' grassland_boundaries <- define_boundary(grassland, 0.1)
-#' 
+#'
 #' plot_boundary(Tcrist_boundaries, grassland_boundaries)
 #' }
 #'
@@ -31,11 +31,11 @@ plot_boundary <- function(x, y, color = NA, trait_names = NA) {
   # prep boundary layers to plot
   x_layer <- terra::as.data.frame(x, xy = TRUE, na.rm = TRUE) %>%
     .[.[,3] != 0,]
-  colnames(x_layer) <- c('lon', 'lat', 'values')
+  colnames(x_layer) <- c('long', 'lat', 'values')
   y_layer <- terra::as.data.frame(y, xy = TRUE, na.rm = TRUE) %>%
     .[.[,3] != 0,]
-  colnames(y_layer) <- c('lon', 'lat', 'values')
-  
+  colnames(y_layer) <- c('long', 'lat', 'values')
+
   # make overlap layer
   xx <- terra::cells(x, 1)[[1]]
   yy <- terra::cells(y, 1)[[1]]
@@ -43,17 +43,17 @@ plot_boundary <- function(x, y, color = NA, trait_names = NA) {
     terra::rowColFromCell(x, .) %>%
     t(.) %>%
     as.data.frame(.)
-  
+
   overlap <- terra::rast(nrow = terra::nrow(x), ncol = terra::ncol(x), crs = terra::crs(x), extent = terra::ext(x))
   index = 1
   for (i in cells_to_fill) {
     overlap[i[1], i[2]] <- 1
     index = index + 1
   }
-  
+
   overlap <- terra::as.data.frame(overlap, xy = TRUE, na.rm = TRUE)
-  colnames(overlap) <- c('lon', 'lat', 'values')
-  
+  colnames(overlap) <- c('long', 'lat', 'values')
+
   # if there are inputs for colors and layer names, change the colors from default
   fill_col <- c('Trait 1' = '#6EC6CA', 'Trait 2' = '#CCABD8', 'Overlap' = '#055B5C')
   if (all(is.na(color))) {
@@ -63,26 +63,22 @@ plot_boundary <- function(x, y, color = NA, trait_names = NA) {
     if(!is.na(color[2])) {fill_col[2] = color[2]}
     if(!is.na(color[3])) {fill_col[3] = color[3]}
   }
-  
+
   if(!is.na(trait_names[1])) {names(fill_col)[1] <- trait_names[1]}
   if(!is.na(trait_names[2])) {names(fill_col)[2] <- trait_names[2]}
-  
+
   # make plot
-  range <- terra::ext(x)
-  lat_range <- c(range[3], range[4])
-  lon_range <- c(range[1], range[2])
-  
-  p <- ggplot2::ggplot(mapping = ggplot2::aes(lon, lat)) +
-    ggplot2::geom_sf(data = rnaturalearth::ne_countries(returnclass = 'sf'), ggplot2::aes(x = NULL, y = NULL),
-                     fill = '#f0f0f0', color = NA) +
+  world_map <- ggplot2::map_data('world')
+  p <- ggplot2::ggplot(mapping = ggplot2::aes(long, lat)) +
+    ggplot2::geom_map(data = world_map, map = world_map, ggplot2::aes(map_id = region), fill = '#e8e8e8') +
     ggplot2::geom_tile(data = x_layer, ggplot2::aes(fill = names(fill_col)[1])) +   # first boundary layer
     ggplot2::geom_tile(data = y_layer, ggplot2::aes(fill = names(fill_col)[2])) +   # second boundary layer
     ggplot2::geom_tile(data = overlap, ggplot2::aes(fill = names(fill_col)[3])) +   # overlapping boundary elements
     ggplot2::scale_fill_manual(values = fill_col) +
-    ggplot2::coord_sf(xlim = lon_range, ylim = lat_range) +
+    ggplot2::coord_sf(xlim = terra::ext(x)[1:2], ylim = terra::ext(x)[3:4]) +
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
     ggplot2::labs(x = 'Longitude', y = 'Latitude', fill = 'Boundary Type')
-  
+
   return(p)
 }
