@@ -1,7 +1,7 @@
 Package: BoundaryStats
 Type: Package
 Title: Calculation of Boundary Overlap Statistics
-Version: 1.0.1
+Version: 2.0.0
 Author: Amy Luo
 Maintainer: Amy Luo <aluo@vols.utk.edu>
 Description: Functions to calculate boundary and boundary overlap statistics for
@@ -15,20 +15,17 @@ Encoding: UTF-8
 LazyData: true
 Imports:
   sf,
-  sp,
   terra,
-  spatialEco,
   pdqr,
   rnaturalearth,
-  spdep,
-  spatialreg,
-  gstat,
   methods,
   ggplot2,
   tibble,
   magrittr,
-  raster,
-  igraph
+  igraph,
+  fields,
+  rgeoda,
+  scales
 Depends:
   R (>= 4.1.0)
 Suggests: knitr, rmarkdown

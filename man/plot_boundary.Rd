@@ -7,9 +7,9 @@
 plot_boundary(x, y, color = NA, trait_names = NA)
 }
 \arguments{
-\item{x}{A RasterLayer object with boundary elements.}
+\item{x}{A SpatRaster object with boundary elements.}
 
-\item{y}{A RasterLayer object with boundary elements.}
+\item{y}{A SpatRaster object with boundary elements.}
 
 \item{color}{Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).}
 
@@ -23,8 +23,20 @@ This is a wrapper function for ggplot2 that will produce a map of boundary
 elements for two traits and show where boundary elements intersect.
 }
 \examples{
-plot_boundary(soil_boundary, genetic_boundary, col = c('pink', 'orange', 'red'),
-              trait_names = c('Soil Type', 'Genetic Group'))
+\dontrun{
+data(T.cristatus)
+T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+terra::ext(T.cristatus) <- T.cristatus_ext
+
+data(grassland)
+grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+terra::ext(grassland) <- grassland_ext
+
+Tcrist_boundaries <- categorical_boundary(T.cristatus)
+grassland_boundaries <- define_boundary(grassland, 0.1)
+
+plot_boundary(Tcrist_boundaries, grassland_boundaries)
+}
 
 }
 \author{

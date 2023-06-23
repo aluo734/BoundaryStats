@@ -58,25 +58,25 @@ kable(stat_functions) %>%
 ```{r eval = F}
 library(BoundaryStats)
 library(tidyverse)
-library(raster)
 
-data(ecoregions)
-data(A.delicatus)
+data(T.cristatus)
+T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+ext(T.cristatus) <- T.cristatus_ext
 
-A.delicatus_ecoregion <- resample(ecoregions, A.delicatus) %>%
-  crop(., A.delicatus) %>%
-  mask(., A.delicatus) %>%
-  categorical_boundary(., projection = 4210)
-A.delicatus <- crop(A.delicatus, A.delicatus_ecoregion) %>%
-  mask(., A.delicatus_ecoregion)
-A.delicatus <- categorical_boundary(A.delicatus, projection = 4210)
+data(grassland)
+grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+ext(grassland) <- grassland_ext
 
-A.deli_overlap.null <- overlap_null_distrib(A.delicatus, A.delicatus_ecoregion, rand_both = F, x_cat = T, n_iterations = 100, projection = 4210, x_model = 'random_cluster')
+Tcrist_boundaries <- categorical_boundary(T.cristatus)
+grassland_boundaries <- define_boundary(grassland, threshold = 0.1)
+plot_boundary(Tcrist_boundaries, grassland_boundaries)
 
-Odirect(A.delicatus, A.delicatus_ecoregion, overlap.null)
-Ox(A.delicatus, A.delicatus_ecoregion, overlap.null)
-Oxy(A.delicatus, A.delicatus_ecoregion, overlap.null)
+Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE, x_cat = T, n_iterations = 100, x_model = 'random_cluster')
+
+Odirect(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+Ox(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+Oxy(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
 ```
 
-Data from:
-Barratt, C.D., Bwong, B.A., Jehle, R., Liedtke, C.H., Nagel, P., Onstein, R.E., Portik, D.M., Streicher, J.W. & Loader, S.P. (2018) Vanishing refuge? Testing the forest refuge hypothesis in coastal East Africa using genome‐wide sequence data for seven amphibians. Molecular Ecology, 27, 4289-4308.
+Data source:
+Cox, Karen; Schepers, Robbert; Van Breusegem, An; Speybroeck, Jeroen (2023), The common ground in landscape effects on gene flow in two newt species in an agroecosystem, Dryad, Dataset, https://doi.org/10.5061/dryad.bk3j9kdhz

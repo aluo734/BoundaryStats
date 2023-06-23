@@ -3,37 +3,37 @@
 #' @title Number of subgraphs
 #' @description Statistical test the for number of subgraphs, or sets of contiguous boundary elements, in the data.
 #'
-#' @param x A RasterLayer object with boundary elements.
+#' @param x A SpatRaster object with boundary elements.
 #' @param null_distrib A list of probability functions output from boundary_null_distrib().
 #'
-#' @return The number of subgraphs in the RasterLayer and a p-value.
-#' @examples
-#' song_raster <- raster('song_dialect_boundaries.asc')
-#' dialect_boundaries <- define_boundary(song_raster, 0.1)
-#' null_dialect_boundary <- boundary_null_distrib(song_raster, threshold = 0.2,
-#'                          n_iterations = 1000, model = 'fractional_brownian',
-#'                          projection = 4326, fract_dim = 1.5)
+#' @return The number of subgraphs in the raster and a p-value.
+#' @examples \dontrun{
+#' data(T.cristatus)
+#' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+#' terra::ext(T.cristatus) <- T.cristatus_ext
 #'
-#' n_subgraphs(dialect_boundaries, dialect_boundary_null)
+#' T.crist_boundaries <- categorical_boundary(T.cristatus)
+#' T.crist_bound_null <- boundary_null_distrib(T.cristatus, cat = TRUE, n_iterations = 100,
+#' model = 'random_cluster')
 #'
+#' n_subgraph(T.crist_boundaries, T.crist_bound_null)
+#' }
+#' 
 #' @author Amy Luo
 #' @references Jacquez, G.M., Maruca,I S. & Fortin M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
 #' @export
 n_subgraph <- function(x, null_distrib) {
-  # clump continuous cells (including cells touching at corners) together; each clump has a different value, 1:n_clumps
-  x_subgraphs <- raster::clump(x)
+  count <- terra::patches(x, directions = 8, zeroAsNA = TRUE) %>%
+    terra::values(.) %>%
+    max(., na.rm = TRUE)
 
-  # number of subgraphs
-  n_subgraph = max(x_subgraphs@data@values, na.rm = T)
-
-  # statistical test
-  p <- null_distrib$n_subgraph(n_subgraph) %>%
+  p <- null_distrib$n_subgraph(count) %>%
     ifelse(. > 0.5, 1 - ., .) %>%
     as.numeric(.)
 
-  names(n_subgraph) <- 'n subgraphs'
+  names(count) <- 'n subgraphs'
   names(p) <-'p-value'
-  return(c(n_subgraph, p))
+  return(c(count, p))
 }
 
 #length of the longest subgraph ----
@@ -41,45 +41,32 @@ n_subgraph <- function(x, null_distrib) {
 #' @title Length of the longest subgraph
 #' @description Statistical test for the length of the longest subgraph, or set of contiguous boundary elements.
 #'
-#' @param x A RasterLayer object with boundary elements.
+#' @param x A SpatRaster object with boundary elements.
 #' @param null_distrib A list of probability functions output from boundary_null_distrib().
-#' @param projection Numeric. EPSG code of input raster layer.
 #'
 #' @return The length of the longest subgraph and a p-value.
-#' @examples
-#' song_raster <- raster('song_dialect_boundaries.asc')
-#' dialect_boundaries <- define_boundary(song_raster, 0.1)
-#' null_dialect_boundary <- boundary_null_distrib(song_raster, threshold = 0.2,
-#'                          n_iterations = 1000, model = 'fractional_brownian',
-#'                          projection = 4326, fract_dim = 1.5)
+#' @examples \dontrun{
+#' data(T.cristatus)
+#' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+#' terra::ext(T.cristatus) <- T.cristatus_ext
 #'
-#' max_subgraph(dialect_boundaries, dialect_boundary_null, projection = 4326)
+#' Tcrist_boundaries <- categorical_boundary(T.cristatus)
+#' T.crist_bound_null <- boundary_null_distrib(T.cristatus, cat = TRUE, n_iterations = 100,
+#' model = 'random_cluster')
 #'
+#' max_subgraph(Tcrist_boundaries, T.crist_bound_null)
+#' }
+#' 
 #' @author Amy Luo
 #' @references Jacquez, G.M., Maruca,I S. & Fortin M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
 #' @export
-max_subgraph <- function(x, null_distrib, projection) {
-  # binarize input data and set non-boundary cells to NA
-  x_mat <- raster::as.matrix(x)
-  for (row in 1:nrow(x_mat)) {
-    for (col in 1:ncol(x_mat)) {
-      if(!is.na(x_mat[row, col])) {
-        if (x_mat[row, col] == 0) {x_mat[row, col] = NA}
-      }
-    }
-  }
-
-  # matrix -> raster -> polygons (cell = boundary element, polygon with contiguous boundary elements = subgraph)
-  x_boundary <- raster::raster(x_mat)
-  raster::extent(x_boundary) <- raster::extent(x)
-  terra::crs(x_boundary) <- paste0('+init=epsg:', projection)
-  xpolygon <- raster::rasterToPolygons(x_boundary, na.rm = T) %>%
-    .[.@data$layer == 1,]
-  raster::crs(xpolygon) <- paste0('+init=EPSG:', 4210)
-  xpolygon <- terra::buffer(xpolygon, width = 0.001, dissolve = T) %>%
+max_subgraph <- function(x, null_distrib) {
+  xpolygon <- terra::subst(x, 0, NA) %>%
+    terra::as.polygons(., na.rm = TRUE) %>%
+    terra::buffer(., 0.001) %>%
+    terra::disagg(.) %>%
     sf::st_as_sf(.)
-
-  # calculate the lengths of the subgraphs and keep the longest length
+  
   lengths <- c()
   for (i in 1:nrow(xpolygon)) {
     lengths <- sf::st_geometry(xpolygon[i,]) %>%
@@ -89,6 +76,7 @@ max_subgraph <- function(x, null_distrib, projection) {
       append(lengths, .) %>%
       as.numeric(.)
   }
+
   max_length <- max(lengths)
 
   # statistical test

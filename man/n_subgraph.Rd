@@ -7,24 +7,28 @@
 n_subgraph(x, null_distrib)
 }
 \arguments{
-\item{x}{A RasterLayer object with boundary elements.}
+\item{x}{A SpatRaster object with boundary elements.}
 
 \item{null_distrib}{A list of probability functions output from boundary_null_distrib().}
 }
 \value{
-The number of subgraphs in the RasterLayer and a p-value.
+The number of subgraphs in the raster and a p-value.
 }
 \description{
 Statistical test the for number of subgraphs, or sets of contiguous boundary elements, in the data.
 }
 \examples{
-song_raster <- raster('song_dialect_boundaries.asc')
-dialect_boundaries <- define_boundary(song_raster, 0.1)
-null_dialect_boundary <- boundary_null_distrib(song_raster, threshold = 0.2,
-                         n_iterations = 1000, model = 'fractional_brownian',
-                         projection = 4326, fract_dim = 1.5)
+\dontrun{
+data(T.cristatus)
+T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+terra::ext(T.cristatus) <- T.cristatus_ext
 
-n_subgraphs(dialect_boundaries, dialect_boundary_null)
+T.crist_boundaries <- categorical_boundary(T.cristatus)
+T.crist_bound_null <- boundary_null_distrib(T.cristatus, cat = TRUE, n_iterations = 100,
+model = 'random_cluster')
+
+n_subgraph(T.crist_boundaries, T.crist_bound_null)
+}
 
 }
 \references{

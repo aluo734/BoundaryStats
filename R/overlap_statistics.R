@@ -3,21 +3,27 @@
 #' @title Direct overlap between boundary elements.
 #' @description Statistical test for the number of directly overlapping boundary elements of two traits.
 #'
-#' @param x A RasterLayer object with boundary elements.
-#' @param y A RasterLayer object with boundary elements.
+#' @param x A SpatRaster object with boundary elements.
+#' @param y A SpatRaster object with boundary elements.
 #' @param null_distrib A list of probability functions output from overlap_null_distrib().
 #'
 #' @return The number of directly overlapping boundary elements and a p-value.
-#' @examples
-#' soil_raster <- raster('soil_types.asc')
-#' genetic_raster <- raster('genetic_assignment_probabilities.asc')
-#'
-#' overlap_null_distribs <- overlap_null_distrib(soil_raster, genetic_raster, n_iterations = 1000,
-#'                                               y_convert = T, threshold = 0.1, projection = 4326)
-#' soil_boundaries <- define_boundary(soil_raster)
-#' genetic_boundaries <- define_boundary(genetic_raster)
-#'
-#' Odirect(soil_boundary, genetic_boundary, overlap_null_distribs)
+#' @examples \dontrun{
+#' data(T.cristatus)
+#' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+#' terra::ext(T.cristatus) <- T.cristatus_ext
+#' 
+#' data(grassland)
+#' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+#' terra::ext(grassland) <- grassland_ext
+#' 
+#' Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE,
+#'   x_cat = TRUE, n_iterations = 100, x_model = 'random_cluster')
+#' Tcrist_boundaries <- categorical_boundary(T.cristatus)
+#' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' 
+#' Odirect(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+#' }
 #'
 #' @author Amy Luo
 #' @references
@@ -25,17 +31,9 @@
 #' Fortin, M.-J., Drapeau, P. & Jacquez, G.M. (1996) Quantification of the Spatial Co-Occurrences of Ecological Boundaries. Oikos, 77, 51-60.
 #' @export
 Odirect <- function(x, y, null_distrib) {
-  x_mat <- raster::as.matrix(x)
-  y_mat <- raster::as.matrix(y)
-
-  count = 0
-  for (row in 1:nrow(x_mat)) {
-    for (col in 1:ncol(x_mat)) {
-      if (!is.na(x_mat[row, col]) & !is.na(y_mat[row, col])) {
-        if (x_mat[row, col] == 1 & y_mat[row, col] == 1) {count = count + 1}
-      }
-    }
-  }
+  xx <- terra::cells(x, 1)[[1]]
+  yy <- terra::cells(y, 1)[[1]]
+  count <- length(intersect(xx, yy))
 
   p <- null_distrib$Odirect(count) %>%
     ifelse(. > 0.5, 1 - ., .) %>%
@@ -54,21 +52,27 @@ Odirect <- function(x, y, null_distrib) {
 #' and the nearest boundary element in raster y. Uses Euclidean distance. The boundaries of
 #' trait x depend on the boundaries of trait y.
 #'
-#' @param x A RasterLayer object with boundary elements.
-#' @param y A RasterLayer object with boundary elements.
+#' @param x A SpatRaster object with boundary elements.
+#' @param y A SpatRaster object with boundary elements.
 #' @param null_distrib A list of probability functions output from overlap_null_distrib().
 #'
 #' @return The average minimum distance and a p-value.
-#' @examples
-#' soil_raster <- raster('soil_types.asc')
-#' genetic_raster <- raster('genetic_assignment_probabilities.asc')
-#'
-#' overlap_null_distribs <- overlap_null_distrib(soil_raster, genetic_raster, n_iterations = 1000,
-#'                                               y_convert = T, threshold = 0.1, projection = 4326)
-#' soil_boundaries <- define_boundary(soil_raster)
-#' genetic_boundaries <- define_boundary(genetic_raster)
-#'
-#' Ox(soil_boundary, genetic_boundary, overlap_null_distribs)
+#' @examples \dontrun{
+#' data(T.cristatus)
+#' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+#' terra::ext(T.cristatus) <- T.cristatus_ext
+#' 
+#' data(grassland)
+#' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+#' terra::ext(grassland) <- grassland_ext
+#' 
+#' Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE,
+#'   x_cat = TRUE, n_iterations = 100, x_model = 'random_cluster')
+#' Tcrist_boundaries <- categorical_boundary(T.cristatus)
+#' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' 
+#' Ox(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+#' }
 #'
 #' @author Amy Luo
 #' @references
@@ -76,35 +80,21 @@ Odirect <- function(x, y, null_distrib) {
 #' Fortin, M.-J., Drapeau, P. & Jacquez, G.M. (1996) Quantification of the Spatial Co-Occurrences of Ecological Boundaries. Oikos, 77, 51-60.
 #' @export
 Ox <- function(x, y, null_distrib) {
-  min_distances <- c()
+  x_min_distances <- c()
 
-  x_mat <- raster::as.matrix(x)
-  y_mat <- raster::as.matrix(y)
-  y_present <- which(y_mat == 1, arr.ind = T)
+  x_bound_cells <- terra::xyFromCell(x, terra::cells(x, 1)[[1]])
+  y_bound_cells <- terra::xyFromCell(y, terra::cells(y, 1)[[1]])
+  dists <- terra::distance(x_bound_cells, y_bound_cells, lonlat = T)
+  for (i in sequence(nrow(dists))) {x_min_distances <- append(x_min_distances, min(dists[i,]))} # for each x boundary cell, the minimum distance to a y boundary cell
 
-  for (row in 1:nrow(x_mat)) {
-    for (col in 1:ncol(x_mat)) {
-      # for each boundary element in x
-      if (!is.na(x_mat[row, col])) {
-        if (x_mat[row, col] == 1) {
-          # calculate the Euclidean distances to each boundary element in y
-          distances <- matrix(nrow = nrow(y_present))
-          for (i in 1:length(distances)) {distances[i] <- sqrt((y_present[i, 1] - row)^2 + (y_present[i, 2] - col)^2)}
-          # and keep the distance to the closest boundary element in y
-          min_distances <- append(min_distances, min(distances))
-        }
-      }
-    }
-  }
+  ave_min_dist <- mean(x_min_distances)
+  names(ave_min_dist) <- 'average minimum distance (x depends on y)'
 
-  stat <- mean(min_distances) # average the minimum distances
-  names(stat) <- 'average minimum distance (x depends on y)'
-
-  p <- null_distrib$Ox(stat) %>%
+  p <- null_distrib$Ox(ave_min_dist) %>%
     ifelse(. > 0.5, 1 - ., .) %>%
     as.numeric(.)
   names(p) <- 'p-value'
-  return(c(stat, p))
+  return(c(ave_min_dist, p))
 }
 
 # Oxy ----
@@ -115,20 +105,27 @@ Ox <- function(x, y, null_distrib) {
 #' Uses Euclidean distance. Boundaries for each trait affect one another reciprocally (x affects y
 #' and y affects x).
 #'
-#' @param x A RasterLayer object with boundary elements.
-#' @param y A RasterLayer object with boundary elements.
+#' @param x A SpatRaster object with boundary elements.
+#' @param y A SpatRaster object with boundary elements.
 #' @param null_distrib A list of probability functions output from overlap_null_distrib().
 #'
 #' @return p-value
-#' @examples
-#' soil_raster <- raster('soil_types.asc')
-#' genetic_raster <- raster('genetic_assignment_probabilities.asc')
-#'
-#' overlap_null_distribs <- overlap_null_distrib(soil_raster, genetic_raster, n_iterations = 1000,
-#'                                               y_convert = T, threshold = 0.1, projection = 4326)
-#' genetic_boundaries <- define_boundary(genetic_raster)
-#'
-#' Oxy(soil_boundary, genetic_boundary, overlap_null_distribs)
+#' @examples \dontrun{
+#' data(T.cristatus)
+#' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+#' terra::ext(T.cristatus) <- T.cristatus_ext
+#' 
+#' data(grassland)
+#' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
+#' terra::ext(grassland) <- grassland_ext
+#' 
+#' Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE,
+#'   x_cat = TRUE, n_iterations = 100, x_model = 'random_cluster')
+#' Tcrist_boundaries <- categorical_boundary(T.cristatus)
+#' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' 
+#' Oxy(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+#' }
 #'
 #' @author Amy Luo
 #' @references
@@ -137,42 +134,19 @@ Ox <- function(x, y, null_distrib) {
 #' @export
 Oxy <- function(x, y, null_distrib) {
   min_distances <- c()
+  
+  x_bound_cells <- terra::xyFromCell(x, terra::cells(x, 1)[[1]])
+  y_bound_cells <- terra::xyFromCell(y, terra::cells(y, 1)[[1]])
+  dists <- terra::distance(x_bound_cells, y_bound_cells, lonlat = T)
+  for (i in sequence(nrow(dists))) {min_distances <- append(min_distances, min(dists[i,]))} # for each x boundary cell, the minimum distance to a y boundary cell
+  for (i in sequence(ncol(dists))) {min_distances <- append(min_distances, min(dists[,i]))} # for each x boundary cell, the minimum distance to a y boundary cell
+  
+  ave_min_dist <- mean(min_distances)
+  names(ave_min_dist) <- 'average minimum distance'
 
-  x_mat <- raster::as.matrix(x)
-  y_mat <- raster::as.matrix(y)
-  x_present <- which(x_mat == 1, arr.ind = T)
-  y_present <- which(y_mat == 1, arr.ind = T)
-
-  for (row in 1:nrow(x_mat)) {
-    for (col in 1:ncol(x_mat)) {
-      if (!is.na(x_mat[row, col])) {
-        if (x_mat[row, col] == 1) {
-          distances <- matrix(nrow = nrow(y_present))
-          for (i in 1:length(distances)) {distances[i] <- sqrt((y_present[i, 1] - row)^2 + (y_present[i, 2] - col)^2)}
-          min_distances <- append(min_distances, min(distances))
-        }
-      }
-    }
-  }
-
-  for (row in 1:nrow(y_mat)) {
-    for (col in 1:ncol(y_mat)) {
-      if (!is.na(y_mat[row, col])) {
-        if (y_mat[row, col] == 1) {
-          distances <- matrix(nrow = nrow(x_present))
-          for (i in 1:length(distances)) {distances[i] <- sqrt((x_present[i, 1] - row)^2 + (x_present[i, 2] - col)^2)}
-          min_distances <- append(min_distances, min(distances))
-        }
-      }
-    }
-  }
-
-  stat <- mean(min_distances)
-  names(stat) <- 'average minimum distance'
-
-  p <- null_distrib$Oxy(stat) %>%
+  p <- null_distrib$Oxy(ave_min_dist) %>%
     ifelse(. > 0.5, 1 - ., .) %>%
     as.numeric(.)
   names(p) <- 'p-value'
-  return(c(stat, p))
+  return(c(ave_min_dist, p))
 }
