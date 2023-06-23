@@ -36,13 +36,12 @@ and 'random_cluster' (modified random clusters method)}
 A list of two probability distribution functions for boundary statistics.
 }
 \description{
-Given a SpatRaster object, this function will simulate a new SpatRaster from a neutral model for a
-specified number of iterations. In each iteration, boundary statistics will be computed for the simulated
-surface. The function outputs probability functions for two boundary statistics (number of subgraphs
-and length of the longest subgraph).
+Creates custom probability distributions for two boundary statistics (number of subgraphs and length
+of the longest subgraph). Given a SpatRaster object, simulates n iterations of random raster
+surfaces from a neutral model.
 }
 \examples{
-\dontrun{
+\donttest{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 terra::ext(T.cristatus) <- T.cristatus_ext

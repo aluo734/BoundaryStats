@@ -1,8 +1,18 @@
 #' @name sobel_operator
 #' @title Sobel-Feldman operator for edge detection
 #' @description Uses a Sobel-Feldman operator (3x3 kernel) to detect internal edges in a SpatRaster object.
+#' 
 #' @param x A SpatRaster object.
 #' @return A SpatRaster object with boundary values.
+#' 
+#' @examples
+#' data(T.cristatus)
+#' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+#' terra::ext(T.cristatus) <- T.cristatus_ext
+#' 
+#' edges <- sobel_operator(T.cristatus)
+#' terra::plot(edges)
+#' 
 #' @author Amy Luo
 #' @export
 sobel_operator <- function(x) {

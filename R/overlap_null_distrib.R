@@ -1,12 +1,11 @@
 #' @name overlap_null_distrib
 #' @title Null distribution for boundary overlap statistics
 #' @description
-#' Given two SpatRaster objects with the same extent and resolution, this function will simulate new
-#' SpatRaster objects from neutral models for a specified number of iterations. In each iteration,
-#' boundary statistics will be computed for the simulated surface. The function outputs probability
-#' functions for three boundary statistics (directly overlapping boundary elements, minimum distance
-#' between boundary elements in x to y, and minimum distance between elements in x and y).
-#'
+#' Creates custom probability distributions for three boundary overlap statistics (directly overlapping
+#' boundary elements, minimum distance between boundary elements in x to y, and minimum distance
+#' between elements in x and y). Given two SpatRaster objects with the same extent, projection, and
+#' resolution, simulates n iterations of random raster surfaces from neutral model(s).
+#' 
 #' @param x A SpatRaster object. If rand_both = FALSE, only this raster will be modeled.
 #' @param y A SpatRaster object. If rand_both = FALSE, this raster does not change.
 #' @param rand_both TRUE if distribution of traits in x and y should be modeled.
@@ -24,7 +23,8 @@
 #' @param progress If progress = TRUE (default) a progress bar will be displayed.
 #'
 #' @return A list of probability distribution functions for boundary overlap statistics.
-#' @examples \dontrun{
+#' 
+#' @examples \donttest{
 #' data(T.cristatus)
 #' T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 #' terra::ext(T.cristatus) <- T.cristatus_ext
@@ -146,7 +146,7 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert =
   distribs <- list(Odirect, Ox, Oxy)
   names(distribs) <- c('Odirect', 'Ox', 'Oxy')
 
-  cat('DONE')
+  message('DONE')
 
   return(distribs)
 

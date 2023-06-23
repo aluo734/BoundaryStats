@@ -18,7 +18,7 @@ The number of subgraphs in the raster and a p-value.
 Statistical test the for number of subgraphs, or sets of contiguous boundary elements, in the data.
 }
 \examples{
-\dontrun{
+\donttest{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 terra::ext(T.cristatus) <- T.cristatus_ext

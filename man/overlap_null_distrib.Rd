@@ -51,14 +51,13 @@ and 'random_cluster' (modified random clusters method)}
 A list of probability distribution functions for boundary overlap statistics.
 }
 \description{
-Given two SpatRaster objects with the same extent and resolution, this function will simulate new
-SpatRaster objects from neutral models for a specified number of iterations. In each iteration,
-boundary statistics will be computed for the simulated surface. The function outputs probability
-functions for three boundary statistics (directly overlapping boundary elements, minimum distance
-between boundary elements in x to y, and minimum distance between elements in x and y).
+Creates custom probability distributions for three boundary overlap statistics (directly overlapping
+boundary elements, minimum distance between boundary elements in x to y, and minimum distance
+between elements in x and y). Given two SpatRaster objects with the same extent, projection, and
+resolution, simulates n iterations of random raster surfaces from neutral model(s).
 }
 \examples{
-\dontrun{
+\donttest{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
 terra::ext(T.cristatus) <- T.cristatus_ext

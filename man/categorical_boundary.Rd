@@ -16,13 +16,11 @@ A SpatRaster object with cell values 1 for boundary elements and 0 for other cel
 Creates boundary element cells where patches of two categories meet.
 }
 \examples{
-\dontrun{
 data(grassland)
 grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 terra::ext(grassland) <- grassland_ext
 
 grassland_boundaries <- categorical_boundary(grassland)
-}
 
 }
 \author{

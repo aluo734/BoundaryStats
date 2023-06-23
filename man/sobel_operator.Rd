@@ -15,6 +15,15 @@ A SpatRaster object with boundary values.
 \description{
 Uses a Sobel-Feldman operator (3x3 kernel) to detect internal edges in a SpatRaster object.
 }
+\examples{
+data(T.cristatus)
+T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
+terra::ext(T.cristatus) <- T.cristatus_ext
+
+edges <- sobel_operator(T.cristatus)
+terra::plot(edges)
+
+}
 \author{
 Amy Luo
 }
