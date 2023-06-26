@@ -5,12 +5,13 @@
 #' @param x A SpatRaster object.
 #' @return A SpatRaster object with cell values 1 for boundary elements and 0 for other cells
 #' 
-#' @examples
+#' @examples \donttest{
 #' data(grassland)
 #' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 #' terra::ext(grassland) <- grassland_ext
 #'
 #' grassland_boundaries <- categorical_boundary(grassland)
+#' }
 #'
 #' @author Amy Luo
 #' @export
