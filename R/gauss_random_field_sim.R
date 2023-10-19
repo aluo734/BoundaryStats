@@ -79,8 +79,6 @@ gauss_random_field_sim <- function (x) {
   terra::ext(x_sim) <- terra::ext(x)
   terra::crs(x_sim) <- terra::crs(x)
 
-  terra::plot(x_sim)
-
   # if input values are all integers, make all simulated values integers
   if (all(na.omit(terra::values(x)) %% 1 == 0)) {terra::values(x_sim) <- round(terra::values(x_sim))}
 

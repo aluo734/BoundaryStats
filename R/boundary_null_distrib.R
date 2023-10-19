@@ -14,6 +14,8 @@
 #' statistical tests. default = 10.
 #' @param model Neutral model to use. Options: 'random' (stochastic), 'gaussian' (Gaussian random field),
 #' and 'random_cluster' (modified random clusters method)
+#' @param p If using modified random clusters, proportion of cells to be marked in percolated raster.Higher values of p
+#' produce larger clusters. Default: p = 0.5
 #' @param progress If progress = TRUE (default) a progress bar will be displayed.
 #'
 #' @return A list of two probability distribution functions for boundary statistics.
@@ -29,7 +31,8 @@
 #' @author Amy Luo
 #' @references Saura, S. & Martínez-Millán, J. (2000). Landscape patterns simulation with a modified random clusters method. Landscape Ecology, 15:661-678.
 #' @export
-boundary_null_distrib <- function(x, convert = FALSE, cat = FALSE, threshold = 0.2, n_iterations = 10, model = 'random', progress = TRUE) {
+boundary_null_distrib <- function(x, convert = FALSE, cat = FALSE, threshold = 0.2, n_iterations = 10, model = 'random', p = 0.5,
+                                  progress = TRUE) {
   # progress bar
   if (progress == TRUE) {progress_bar = txtProgressBar(min = 0, max = n_iterations, initial = 0, char = '+', style = 3)}
 
@@ -46,7 +49,7 @@ boundary_null_distrib <- function(x, convert = FALSE, cat = FALSE, threshold = 0
       } else if (model == 'gaussian') {
         x_sim <- gauss_random_field_sim(x)
       } else if (model == 'random_cluster') {
-        x_sim <- mod_random_clust_sim(x)
+        x_sim <- mod_random_clust_sim(x, p)
       }
       
       if (cat == F) {
