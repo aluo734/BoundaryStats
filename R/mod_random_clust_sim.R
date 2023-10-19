@@ -30,7 +30,7 @@ mod_random_clust_sim <- function (x, p) {
   x_sim <- terra::rast(x_sim, crs = terra::crs(x), ext = terra::ext(x)) %>%
     terra::patches(., zeroAsNA = TRUE)
   x_sim[is.na(x_sim)] <- 0
-  x_sim[x_sim != 0] <- x_sim[x_sim != 0] + nrow(unique(x))
+  x_sim[x_sim != 0] <- x_sim[x_sim != 0] + nrow(terra::unique(x))
 
   # C: assign clusters to categories
   prop <- terra::freq(x, digits = 2) %>% # proportions of cells in category
