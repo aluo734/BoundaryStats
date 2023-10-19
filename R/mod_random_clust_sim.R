@@ -36,9 +36,7 @@ mod_random_clust_sim <- function (x, p) {
   prop <- terra::freq(x, digits = 2) %>% # proportions of cells in category
     as.data.frame(.) %>%
     tibble::add_column(., p = .$count/sum(.$count)) %>%
-    .[order(.$p), -c(1,3)]
-  rownames(prop) <- 1:nrow(prop)
-
+    .[order(.$p),c(2, 4)]
   clump_selection_order <- sample(terra::unique(x_sim)[-1,])
   areas <- terra::cellSize(x_sim)
   total_area <- terra::expanse(x_sim)
@@ -64,14 +62,13 @@ mod_random_clust_sim <- function (x, p) {
       x_sim[.] %>%
       subset(., patches != 0) %>%
       table(.) %>%
-      as.data.frame(.) %>%
-      sort(., decreasing = TRUE)
-    
+      as.data.frame(.)
+
     if (length(choices != 0)) {
       choices <- as.vector(choices[choices$Freq == max(choices$Freq), 1])
       if (length(choices > 1)) {x_sim[i] = as.numeric(sample(choices, 1))} else {x_sim[1] = as.numeric(choices)}
     } else {
-      x_sim[i] <- sample(1:nrow(prop), 1, prob = prop[order(prop$value),][,2])
+      x_sim[i] <- sample(prop[,1], 1, prob = prop[,2])
     }
   }
   # crop extent of filled values to input data range

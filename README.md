@@ -14,9 +14,10 @@ between the spatial boundaries of two variables.
 
 ## Installation
 
-You can install BoundaryStats with:
+You can install BoundaryStats with either:
 
 ``` r
+install.packages('BoundaryStats')
 remotes::install_github("aluo734/BoundaryStats")
 ```
 
