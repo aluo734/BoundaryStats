@@ -4,6 +4,7 @@
 #' distribution of values.
 #'
 #' @param x A SpatRaster object.
+#' @param p The proportion of cells to be marked in percolated raster. Higher values of p produce larger clusters.
 #' @return A SpatRaster object with boundary elements.
 #' 
 #' @examples
@@ -18,42 +19,33 @@
 #' @references
 #' Saura, S. & Martínez-Millán, J. (2000) Landscape patterns simulation with a modified random clusters method. Landscape Ecology, 15, 661 – 678.
 #' @export
-mod_random_clust_sim <- function (x) {
+mod_random_clust_sim <- function (x, p) {
   # A: make percolated raster, where proportion of filled cells = p_cluster
   x_sim <- matrix(nrow = terra::nrow(x), ncol = terra::ncol(x))
   for (i in 1:length(x_sim)) {
-    if (stats::runif(1) <= 0.5) {x_sim[i] = 1}
+    if (stats::runif(1) <= p) {x_sim[i] = 1} else {x_sim[i] = 0}
   }
-  
-  opp <- matrix(nrow = terra::nrow(x), ncol = terra::ncol(x)) # matrix with opposite cells marked for clumping
-  opp[is.na(x_sim[])] <- 1
   
   # B: find clusters in raster
   x_sim <- terra::rast(x_sim, crs = terra::crs(x), ext = terra::ext(x)) %>%
-    terra::patches(.)
-  
-  opp <- terra::rast(opp, crs = terra::crs(x), ext = terra::ext(x)) %>%
-    terra::patches(.)
-  terra::values(opp) <- terra::values(opp) + 0.5
-  
-  x_sim <- terra::merge(x_sim, opp)
-  terra::values(x_sim)  <- terra::values(x) %>%
-    na.omit(.) %>%
-    max(.) + terra::values(x_sim)
-  
+    terra::patches(., zeroAsNA = TRUE)
+  x_sim[is.na(x_sim)] <- 0
+  x_sim[x_sim != 0] <- x_sim[x_sim != 0] + nrow(unique(x))
+
   # C: assign clusters to categories
   prop <- terra::freq(x, digits = 2) %>% # proportions of cells in category
     as.data.frame(.) %>%
     tibble::add_column(., p = .$count/sum(.$count)) %>%
-    .[order(-.$p),-1]
-  
-  clump_selection_order <- sample(terra::unique(x_sim))[,1]
+    .[order(.$p), -c(1,3)]
+  rownames(prop) <- 1:nrow(prop)
+
+  clump_selection_order <- sample(terra::unique(x_sim)[-1,])
   areas <- terra::cellSize(x_sim)
   total_area <- terra::expanse(x_sim)
   
   row = 1
   for (i in clump_selection_order) {
-    assignment = prop[row, 1]; max_prop = prop[row, 3]
+    assignment = prop[row, 1]; max_prop = prop[row, 2]
     terra::values(x_sim)[terra::values(x_sim) == i] <- assignment
     
     current_prop <- which(terra::values(x_sim) == assignment) %>%
@@ -65,6 +57,23 @@ mod_random_clust_sim <- function (x) {
     if (row > nrow(prop)) {break}
   }
   
+  # D: fill in the rest of the cells
+  cells_to_fill <- terra::cells(x_sim, 0)[[1]]
+  for (i in cells_to_fill) {
+    choices <- terra::adjacent(x_sim, i)[1,] %>%
+      x_sim[.] %>%
+      subset(., patches != 0) %>%
+      table(.) %>%
+      as.data.frame(.) %>%
+      sort(., decreasing = TRUE)
+    
+    if (length(choices != 0)) {
+      choices <- as.vector(choices[choices$Freq == max(choices$Freq), 1])
+      if (length(choices > 1)) {x_sim[i] = as.numeric(sample(choices, 1))} else {x_sim[1] = as.numeric(choices)}
+    } else {
+      x_sim[i] <- sample(1:nrow(prop), 1, prob = prop[order(prop$value),][,2])
+    }
+  }
   # crop extent of filled values to input data range
   x_sim <- terra::mask(x_sim, x)
   
