@@ -16,6 +16,8 @@ overlap_null_distrib(
   n_iterations = 10,
   x_model = "random",
   y_model = "random",
+  px = 0.5,
+  py = 0.5,
   progress = TRUE
 )
 }
@@ -35,7 +37,7 @@ overlap_null_distrib(
 \item{y_cat}{TRUE if y contains a categorical variable. default = FALSE.}
 
 \item{threshold}{A value between 0 and 1. The proportion of cells to keep as
-boundary elements. default = 0.2.}
+boundary elements. Default = 0.2.}
 
 \item{n_iterations}{An integer indicating the number of iterations for the function. A value of 100 or 1000
 is recommended to produce sufficient resolution for downstream statistical tests. default = 10.}
@@ -44,6 +46,12 @@ is recommended to produce sufficient resolution for downstream statistical tests
 and 'random_cluster' (modified random clusters method)}
 
 \item{y_model}{Neutral model to use for y.}
+
+\item{px}{If using modified random clusters for x, proportion of cells to be marked in percolated raster. Higher values of
+p produce larger clusters. Default = 0.5}
+
+\item{py}{If using modified random clusters for y, proportion of cells to be marked in percolated raster. Higher values of
+p produce larger clusters. Default = 0.5}
 
 \item{progress}{If progress = TRUE (default) a progress bar will be displayed.}
 }

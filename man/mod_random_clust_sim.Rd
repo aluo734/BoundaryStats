@@ -4,10 +4,12 @@
 \alias{mod_random_clust_sim}
 \title{Modified random cluster neutral landscape model}
 \usage{
-mod_random_clust_sim(x)
+mod_random_clust_sim(x, p)
 }
 \arguments{
 \item{x}{A SpatRaster object.}
+
+\item{p}{The proportion of cells to be marked in percolated raster. Higher values of p produce larger clusters.}
 }
 \value{
 A SpatRaster object with boundary elements.
@@ -21,7 +23,7 @@ data(grassland)
 grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 terra::ext(grassland) <- grassland_ext
 
-simulation <- mod_random_clust_sim(grassland)
+simulation <- mod_random_clust_sim(grassland, p = 0.6)
 terra::plot(simulation)
 
 }

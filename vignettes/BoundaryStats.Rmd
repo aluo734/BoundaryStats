@@ -86,7 +86,7 @@ The function boundary_null_distrib() simulates neutral landscapes based on the i
 Three neutral models are currently available: complete stochasticity (default), Gaussian random fields, and modified random clusters. Random cluster models are suited to categorical variables like group identity (cat = T), so we use it here.
 
 ```{r}
-L.flav_bound.null <- boundary_null_distrib(L.flavomaculatus, cat = T, n_iterations = 50, model = 'random_cluster', progress = F)
+L.flav_bound.null <- boundary_null_distrib(L.flavomaculatus, cat = T, n_iterations = 50, model = 'random_cluster', p = 0.7, progress = F)
 ```
 
 ### Run statistical tests
