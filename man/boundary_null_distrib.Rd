@@ -11,6 +11,7 @@ boundary_null_distrib(
   threshold = 0.2,
   n_iterations = 10,
   model = "random",
+  p = 0.5,
   progress = TRUE
 )
 }
@@ -29,6 +30,9 @@ statistical tests. default = 10.}
 
 \item{model}{Neutral model to use. Options: 'random' (stochastic), 'gaussian' (Gaussian random field),
 and 'random_cluster' (modified random clusters method)}
+
+\item{p}{If using modified random clusters, proportion of cells to be marked in percolated raster.Higher values of p
+produce larger clusters. Default: p = 0.5}
 
 \item{progress}{If progress = TRUE (default) a progress bar will be displayed.}
 }

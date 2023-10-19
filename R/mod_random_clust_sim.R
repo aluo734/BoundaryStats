@@ -12,7 +12,7 @@
 #' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 #' terra::ext(grassland) <- grassland_ext
 #' 
-#' simulation <- mod_random_clust_sim(grassland)
+#' simulation <- mod_random_clust_sim(grassland, p = 0.6)
 #' terra::plot(simulation)
 #' 
 #' @author Amy Luo
