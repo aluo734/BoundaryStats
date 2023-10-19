@@ -29,7 +29,7 @@ library(magrittr)
 ### Ecoregion data
 ``` {r fig.width = 8, fig.height = 6}
 data(ecoregions)
-ecoregions <- terra::rast(ecoregions_matrix, crs = ecoregions_crs)
+ecoregions <- rast(ecoregions_matrix, crs = ecoregions_crs)
 ext(ecoregions) <- ecoregions_ext
 plot(ecoregions)
 ```
@@ -40,7 +40,7 @@ These data are based on the ADMIXTURE results from Barratt et al. 2018. The poin
 
 ```{r fig.width = 8, fig.height = 6}
 data(L.flavomaculatus)
-L.flavomaculatus <- terra::rast(L.flavomaculatus_matrix, crs = L.flavomaculatus_crs)
+L.flavomaculatus <- rast(L.flavomaculatus_matrix, crs = L.flavomaculatus_crs)
 ext(L.flavomaculatus) <- L.flavomaculatus_ext
 plot(L.flavomaculatus)
 ```
@@ -86,7 +86,7 @@ The function boundary_null_distrib() simulates neutral landscapes based on the i
 Three neutral models are currently available: complete stochasticity (default), Gaussian random fields, and modified random clusters. Random cluster models are suited to categorical variables like group identity (cat = T), so we use it here.
 
 ```{r}
-L.flav_bound.null <- boundary_null_distrib(L.flavomaculatus, cat = T, n_iterations = 50, model = 'random_cluster', p = 0.7, progress = F)
+L.flav_bound.null <- boundary_null_distrib(L.flavomaculatus, cat = T, n_iterations = 50, model = 'random_cluster', p = 0.5, progress = F)
 ```
 
 ### Run statistical tests
@@ -105,7 +105,7 @@ max_subgraph(L.flavomaculatus_boundaries, L.flav_bound.null)
 Usage for overlap_null_distrib is similar to boundary_null_distrib, but takes raster surfaces for two traits (x and y), along with arguments for each trait.
 
 ```{r}
-L.flav_overlap.null <- overlap_null_distrib(L.flavomaculatus, ecoregions, rand_both = F, x_cat = T, n_iterations = 50, x_model = 'random_cluster', progress = F)
+L.flav_overlap.null <- overlap_null_distrib(L.flavomaculatus, ecoregions, rand_both = F, x_cat = T, n_iterations = 50, x_model = 'random_cluster', px = 0.5, progress = F)
 ```
 
 ### Run statistical tests
