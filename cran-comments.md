@@ -1,5 +1,23 @@
 ## Notes
 
+### Version 2.1.0 submission
+
+## Test environments
+* macOS R 4.3.0
+* Rhub
+* win-builder
+
+## R CMD check results
+* checking for non-standard things in the check directory
+    Found the following files/directories:
+    ''NULL''
+    Found the following files/directories:
+
+* checking for detritus in the temp directory
+    'lastMiKTeXException'
+
+Apparent bugs in Rhub.
+
 ### Third Submission
 
 > Unknown, possibly misspelled, fields in DESCRIPTION:

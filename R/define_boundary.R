@@ -12,12 +12,13 @@
 #'
 #' @return A SpatRaster object with cell values 1 for boundary elements and 0 for other cells
 #' 
-#' @examples
+#' @examples \donttest{
 #' data(grassland)
 #' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 #' terra::ext(grassland) <- grassland_ext
 #' 
 #' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' }
 #' 
 #' @author Amy Luo
 #' @references
