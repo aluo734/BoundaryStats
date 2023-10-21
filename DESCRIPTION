@@ -1,7 +1,7 @@
 Package: BoundaryStats
 Type: Package
 Title: Boundary Overlap Statistics
-Version: 2.1.0
+Version: 2.1.1
 Authors@R: c(
   person(given = 'Amy',
         family = 'Luo',
