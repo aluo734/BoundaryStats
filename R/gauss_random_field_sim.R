@@ -6,13 +6,14 @@
 #' @param x A SpatRaster object.
 #' @return A SpatRaster object with boundary elements.
 #' 
-#' @examples
-#' data(grassland)
+#' @examples \donttest{
+#' #' data(grassland)
 #' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 #' terra::ext(grassland) <- grassland_ext
 #' 
 #' simulation <- gauss_random_field_sim(grassland)
 #' terra::plot(simulation)
+#' }
 #'
 #' @author Amy Luo
 #' @references

@@ -22,11 +22,13 @@ boundary intensity values. If the SpatRaster contains trait values, the values c
 to boundary/edge values (convert = T) using a Sobel-Feldman operator.
 }
 \examples{
+\donttest{
 data(grassland)
 grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 terra::ext(grassland) <- grassland_ext
 
 grassland_boundaries <- define_boundary(grassland, 0.1)
+}
 
 }
 \references{
