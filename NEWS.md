@@ -1,3 +1,11 @@
+## version 2.2.0
+
+---
+
+### Updates
+
+- removed dependency on rgeoda
+
 ## version 2.1.0
 
 ---
