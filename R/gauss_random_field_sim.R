@@ -5,12 +5,12 @@
 #'
 #' @param x A SpatRaster object.
 #' @return A SpatRaster object with boundary elements.
-#' 
+#'
 #' @examples \donttest{
 #' #' data(grassland)
 #' grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 #' terra::ext(grassland) <- grassland_ext
-#' 
+#'
 #' simulation <- gauss_random_field_sim(grassland)
 #' terra::plot(simulation)
 #' }
@@ -21,35 +21,39 @@
 #' @export
 gauss_random_field_sim <- function (x) {
   # estimate autocorrelation range using local Moran's I + LISA clustering
-  cell_vals <- terra::cells(x) %>%
-    terra::values(x)[.] %>%
-    as.data.frame(.)
-
-  lisa_clusters <- terra::as.polygons(x, dissolve = F) %>%
-    sf::st_as_sf(.) %>%
-    rgeoda::queen_weights(.) %>%
-    rgeoda::local_moran(., cell_vals) %>%
-    rgeoda::lisa_clusters(.) %>%
-    data.frame(cellID = terra::cells(x), group = .)
-
-  cells_to_fill <- terra::rowColFromCell(x, terra::cells(x))
-  x_cluster <- terra::rast(nrow = terra::nrow(x), ncol = terra::ncol(x), crs = terra::crs(x), extent = terra::ext(x))
-  index = 1
-  for (i in sequence(nrow(lisa_clusters))) {
-    x_cluster[cells_to_fill[i,1], cells_to_fill[i,2]] <- lisa_clusters[index, 2]
-    index = index + 1
-  }
-
-  x_cluster <- terra::as.polygons(x_cluster, na.rm = TRUE) %>%
+  polys <- terra::as.polygons(x, dissolve = F) %>%
+    sf::st_as_sf() %>%
+    sf::st_buffer(0.01)
+  names(polys)[1] <- 'values'
+  
+  x_cluster <- polys %>%
+    dplyr::mutate(nb = sfdep::st_contiguity(geometry),
+                  wt = sfdep::st_weights(nb, allow_zero = T),
+                  local_moran = sfdep::local_moran(values, nb, wt)) %>%
+    tidyr::unnest(local_moran) %>%
+    dplyr::mutate(cluster = ifelse(p_ii <= 0.05, 1, NA)) %>%
+    dplyr::select(cluster, geometry) %>%
+    terra::rasterize(x, field = 'cluster') %>%
+    terra::as.polygons(na.rm = T) %>%
     terra::buffer(., 0.01) %>%
-    terra::disagg(.) %>%
-    sf::st_as_sf(.) %>%
-    sf::st_area(.)
+    terra::disagg() %>%
+    sf::st_as_sf()
+
+  lengths <- c()
+  for (i in 1:nrow(x_cluster)) {
+    lengths <- sf::st_geometry(x_cluster[i,]) %>%
+      sf::st_cast(., "POINT") %>%
+      sf::st_distance() %>%
+      max() %>%
+      append(lengths, .) %>%
+      as.numeric()
+  }
+  median_length <- median(lengths)
 
   cell_size <- terra::cellSize(x, transform = T) %>%
-    terra::values(.) %>%
-    mean(.)
-  corr_range <- sqrt(as.numeric(median(x_cluster)))/sqrt(cell_size)
+    terra::values() %>%
+    mean
+  corr_range <- median_length/sqrt(cell_size)
 
   # simulate raster
   repeat {

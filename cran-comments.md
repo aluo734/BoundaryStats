@@ -1,5 +1,9 @@
 ## Notes
 
+### Version 2.2.0 submission
+
+removed dependency on rgeoda
+
 ### Version 2.1.1 submission
 
 > Flavor: r-devel-windows-x86_64

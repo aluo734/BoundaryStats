@@ -17,12 +17,14 @@ Simulates a gaussian random field as a neutral landscape of the same extent and 
 input raster, using the same spatial autocorrelation range as the input
 }
 \examples{
-data(grassland)
+\donttest{
+#' data(grassland)
 grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 terra::ext(grassland) <- grassland_ext
 
 simulation <- gauss_random_field_sim(grassland)
 terra::plot(simulation)
+}
 
 }
 \references{
