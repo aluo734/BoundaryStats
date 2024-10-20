@@ -25,12 +25,10 @@ Imports:
   ggplot2,
   tibble,
   dplyr,
-  tidyr,
   magrittr,
   igraph,
   fields,
-  scales,
-  sfdep
+  scales
 Depends:
   R (>= 4.1.0)
 Suggests: knitr, rmarkdown
