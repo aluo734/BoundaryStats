@@ -38,7 +38,10 @@ boundary_null_distrib <- function(x, convert = FALSE, cat = FALSE, threshold = 0
 
   # make output vectors for repeat loop
   n_subgraph = c(); longest_subgraph = c()
-  
+
+  # if Gaussian is chosen, calculate spatial autocorrelation distance with LISA clusters
+  if (model == 'gaussian') {corr <- lisa_clusters(x)}
+
   # n iterations of random boundaries + stats
   rep = 0
   repeat {
@@ -47,34 +50,34 @@ boundary_null_distrib <- function(x, convert = FALSE, cat = FALSE, threshold = 0
       if (model == 'random') {
         x_sim <- random_raster_sim(x)
       } else if (model == 'gaussian') {
-        x_sim <- gauss_random_field_sim(x)
+        x_sim <- gauss_random_field_sim(x, corr)
       } else if (model == 'random_cluster') {
         x_sim <- mod_random_clust_sim(x, p)
       }
-      
+
       if (cat == F) {
         x_boundary <- define_boundary(x_sim, threshold, convert)
       } else {
         x_boundary <- categorical_boundary(x_sim)
       }
-      
+
       if (sum(terra::values(x_boundary) == 1, na.rm = TRUE) >= 1) {break}
     }
-    
+
     # number of subgraphs ----
     count <- terra::patches(x_boundary, directions = 8, zeroAsNA = TRUE) %>%
       terra::values(.) %>%
       max(., na.rm = TRUE)
-    
+
     n_subgraph = append(n_subgraph, count)
-    
+
     # maximum length of a subgraph ----
     xpolygon <- terra::subst(x_boundary, 0, NA) %>%
       terra::as.polygons(., na.rm = TRUE) %>%
       terra::buffer(., 0.001) %>%
       terra::disagg(.) %>%
       sf::st_as_sf(.)
-    
+
     lengths <- c()
     for (i in 1:nrow(xpolygon)) {
       lengths <- sf::st_geometry(xpolygon[i,]) %>%
@@ -84,10 +87,10 @@ boundary_null_distrib <- function(x, convert = FALSE, cat = FALSE, threshold = 0
         append(lengths, .) %>%
         as.numeric(.)
     }
-    
+
     longest_subgraph <- max(lengths) %>%
       append(longest_subgraph, .)
-    
+
     # loop count and break ----
     rep = rep + 1
     if (progress == TRUE) {setTxtProgressBar(progress_bar, rep)}
@@ -96,13 +99,13 @@ boundary_null_distrib <- function(x, convert = FALSE, cat = FALSE, threshold = 0
       break
     }
   }
-  
+
   # output
   n_subgraph <- pdqr::new_p(n_subgraph, type = 'continuous')
   longest_subgraph <- pdqr::new_p(longest_subgraph, type = 'continuous')
   distribs <- list(n_subgraph, longest_subgraph)
   names(distribs) <- c('n_subgraph', 'longest_subgraph')
-  
+
   message('DONE')
 
   return(distribs)
