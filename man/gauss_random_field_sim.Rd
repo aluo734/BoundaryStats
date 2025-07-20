@@ -4,12 +4,12 @@
 \alias{gauss_random_field_sim}
 \title{Gaussian random field neutral model}
 \usage{
-gauss_random_field_sim(x, corr_range)
+gauss_random_field_sim(x, autocorr_range)
 }
 \arguments{
 \item{x}{A SpatRaster object.}
 
-\item{corr_range}{The range of spatial autocorrelation to simulate. Can be estimated using the lisa_clusters function.}
+\item{autocorr_range}{Distance range of spatial autocorrelation.}
 }
 \value{
 A SpatRaster object with boundary elements.
@@ -20,12 +20,11 @@ input raster, using the same spatial autocorrelation range as the input
 }
 \examples{
 \donttest{
-#' data(grassland)
+data(grassland)
 grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 terra::ext(grassland) <- grassland_ext
 
-corr <- lisa_clusters(grassland)
-simulation <- gauss_random_field_sim(grassland, corr)
+simulation <- gauss_random_field_sim(grassland, 3)
 terra::plot(simulation)
 }
 

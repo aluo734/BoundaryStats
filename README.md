@@ -24,82 +24,135 @@ remotes::install_github("aluo734/BoundaryStats")
 ## Statistical Tests
 
 <table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+
 <thead>
+
 <tr>
+
 <th style="text-align:left;">
+
 Function
 </th>
+
 <th style="text-align:left;">
+
 Category
 </th>
+
 <th style="text-align:left;">
+
 Description
 </th>
+
 </tr>
+
 </thead>
+
 <tbody>
+
 <tr>
+
 <td style="text-align:left;">
-n_subgraph
+
+n_boundaries
 </td>
+
 <td style="text-align:left;">
+
 Boundary
 </td>
+
 <td style="text-align:left;">
+
 The number of subgraphs, or sets of contiguous boundary elements, in the
 data.
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:left;">
-max_subgraph
+
+longest_boundary
 </td>
+
 <td style="text-align:left;">
+
 Boundary
 </td>
+
 <td style="text-align:left;">
+
 The length of the longest subgraph.
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:left;">
-Odirect
+
+n_overlap_boundaries
 </td>
+
 <td style="text-align:left;">
+
 Boundary Overlap
 </td>
+
 <td style="text-align:left;">
+
 The number of directly overlapping boundary elements, or raster cells
-labelled as part of a boundary, of two traits.
+labeled as part of a boundary, of two traits.
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:left;">
-Ox
+
+average_min_x_to_y
 </td>
+
 <td style="text-align:left;">
+
 Boundary Overlap
 </td>
+
 <td style="text-align:left;">
+
 The average minimum distance between each boundary element in raster x
 and the nearest boundary element in raster y. Uses Euclidean distance.
 The boundaries of trait x depend on the boundaries of trait y.
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:left;">
-Oxy
+
+average_min_distance
 </td>
+
 <td style="text-align:left;">
+
 Boundary Overlap
 </td>
+
 <td style="text-align:left;">
+
 The average minimum distance between boundary elements in two raster
 layers. Uses Euclidean distance. Boundaries for each trait affect one
 another reciprocally (x affects y and y affects x).
 </td>
+
 </tr>
+
 </tbody>
+
 </table>
 
 ## Example
@@ -108,23 +161,30 @@ another reciprocally (x affects y and y affects x).
 library(BoundaryStats)
 library(tidyverse)
 
-data(T.cristatus)
-T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
-ext(T.cristatus) <- T.cristatus_ext
+data(ecoregions)
+ecoregions <- terra::rast(ecoregions_matrix, crs = ecoregions_crs)
+terra::ext(ecoregions) <- ecoregions_ext
 
-data(grassland)
-grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
-ext(grassland) <- grassland_ext
+data(L.flavomaculatus)
+L.flavomaculatus <- terra::rast(L.flavomaculatus_matrix, crs = L.flavomaculatus_crs)
+terra::ext(L.flavomaculatus) <- L.flavomaculatus_ext
 
-Tcrist_boundaries <- categorical_boundary(T.cristatus)
-grassland_boundaries <- define_boundary(grassland, threshold = 0.1)
-plot_boundary(Tcrist_boundaries, grassland_boundaries)
+terra::crs(ecoregions) <- terra::crs(L.flavomaculatus)
+ecoregions <- terra::resample(ecoregions, L.flavomaculatus) |>
+  terra::crop(L.flavomaculatus) |>
+  terra::mask(L.flavomaculatus)
+L.flavomaculatus <- terra::crop(L.flavomaculatus, ecoregions) |>
+  terra::mask(ecoregions)
 
-Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE, x_cat = T, n_iterations = 100, x_model = 'random_cluster')
+L.flavomaculatus_boundary <- define_boundary(L.flavomaculatus, cat = TRUE)
+ecoregions_boundary <- define_boundary(ecoregions, cat = T)
+plot_boundary(L.flavomaculatus, ecoregions)
 
-Odirect(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
-Ox(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
-Oxy(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+Tcrist_ovlp_null <- overlap_null_distrib(L.flavomaculatus, ecoregions, rand_both = FALSE, x_cat = T, n_iterations = 100, x_model = 'random_cluster')
+
+n_overlap_boundaries(L.flavomaculatus, ecoregions, Tcrist_ovlp_null)
+average_min_x_to_y(L.flavomaculatus, ecoregions, Tcrist_ovlp_null)
+average_min_distance(L.flavomaculatus, ecoregions, Tcrist_ovlp_null)
 ```
 
 Data source: Cox, Karen; Schepers, Robbert; Van Breusegem, An;

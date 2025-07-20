@@ -21,20 +21,17 @@
 #' @export
 mod_random_clust_sim <- function (x, p) {
   # A: make percolated raster, where proportion of filled cells = p_cluster
-  x_sim <- matrix(nrow = terra::nrow(x), ncol = terra::ncol(x))
-  for (i in 1:length(x_sim)) {
+  x_sim <- terra::rast(nrows = nrow(x), ncols = ncol(x), extent = terra::ext(x), crs = terra::crs(x))
+  for (i in terra::cells(x)) {
     if (stats::runif(1) <= p) {x_sim[i] = 1} else {x_sim[i] = 0}
   }
-  
+
   # B: find clusters in raster
-  x_sim <- terra::rast(x_sim, crs = terra::crs(x), ext = terra::ext(x)) %>%
-    terra::patches(., zeroAsNA = TRUE)
-  x_sim[is.na(x_sim)] <- 0
-  x_sim[x_sim != 0] <- x_sim[x_sim != 0] + nrow(terra::unique(x))
+  x_sim <- terra::patches(x_sim, zeroAsNA = TRUE)
 
   # C: assign clusters to categories
   prop <- terra::freq(x, digits = 2) %>% # proportions of cells in category
-    as.data.frame(.) %>%
+    as.data.frame %>%
     tibble::add_column(., p = .$count/sum(.$count)) %>%
     .[order(.$p),c(2, 4)]
   clump_selection_order <- sample(terra::unique(x_sim)[-1,])
@@ -56,13 +53,13 @@ mod_random_clust_sim <- function (x, p) {
   }
   
   # D: fill in the rest of the cells
-  cells_to_fill <- terra::cells(x_sim, 0)[[1]]
-  for (i in cells_to_fill) {
-    choices <- terra::adjacent(x_sim, i)[1,] %>%
+  for (i in setdiff(terra::cells(x), terra::cells(x_sim))) {
+    choices <- terra::adjacent(x_sim, i) %>%
+      as.vector %>%
       x_sim[.] %>%
-      subset(., patches != 0) %>%
-      table(.) %>%
-      as.data.frame(.)
+      subset(patches != 0) %>%
+      table %>%
+      as.data.frame
 
     if (length(choices != 0)) {
       choices <- as.vector(choices[choices$Freq == max(choices$Freq), 1])
@@ -71,8 +68,6 @@ mod_random_clust_sim <- function (x, p) {
       x_sim[i] <- sample(prop[,1], 1, prob = prop[,2])
     }
   }
-  # crop extent of filled values to input data range
-  x_sim <- terra::mask(x_sim, x)
   
   return(x_sim)
   

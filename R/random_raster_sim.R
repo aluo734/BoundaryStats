@@ -20,12 +20,12 @@
 #' @export
 random_raster_sim <- function (x) {
   values <- terra::values(x) %>%
-    na.omit(.) %>%
-    sample(.)
+    na.omit %>%
+    sample
   cells_to_fill <- terra::cells(x) %>%
     terra::rowColFromCell(x, .) %>%
-    t(.) %>%
-    as.data.frame(.)
+    t %>%
+    as.data.frame
   
   x_sim <- terra::rast(nrow = terra::nrow(x), ncol = terra::ncol(x), crs = terra::crs(x), extent = terra::ext(x))
   index = 1

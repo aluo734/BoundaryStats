@@ -8,8 +8,8 @@ overlap_null_distrib(
   x,
   y,
   rand_both,
-  x_convert = FALSE,
-  y_convert = FALSE,
+  x_calculate_intensity = FALSE,
+  y_calculate_intensity = FALSE,
   x_cat = FALSE,
   y_cat = FALSE,
   threshold = 0.2,
@@ -28,9 +28,9 @@ overlap_null_distrib(
 
 \item{rand_both}{TRUE if distribution of traits in x and y should be modeled.}
 
-\item{x_convert}{TRUE if x contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.}
+\item{x_calculate_intensity}{TRUE if x contains numeric trait data from which boundary intensities should be calculated. default = FALSE.}
 
-\item{y_convert}{TRUE if y contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.}
+\item{y_calculate_intensity}{TRUE if y contains numeric trait data from which boundary intensities should be calculated. default = FALSE.}
 
 \item{x_cat}{TRUE if x contains a categorical variable. default = FALSE.}
 

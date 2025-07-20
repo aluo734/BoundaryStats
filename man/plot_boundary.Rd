@@ -4,7 +4,7 @@
 \alias{plot_boundary}
 \title{Map the boundary elements of two raster layers}
 \usage{
-plot_boundary(x, y, color = NA, trait_names = NA)
+plot_boundary(x, y, color = NA, trait_names = NA, output_raster = FALSE)
 }
 \arguments{
 \item{x}{A SpatRaster object with boundary elements.}
@@ -14,6 +14,9 @@ plot_boundary(x, y, color = NA, trait_names = NA)
 \item{color}{Optional. A character vector of up to three colors (x boundary, y boundary, and overlapping elements).}
 
 \item{trait_names}{Optional. A character vector with up to two elements (legend name for x and legend name for y).}
+
+\item{output_raster}{Returns a SpatRaster object with the boundary elements of each trait and overlapping
+boundary elements together in a single layer.}
 }
 \value{
 A ggplot2 object.
@@ -31,8 +34,8 @@ data(grassland)
 grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 terra::ext(grassland) <- grassland_ext
 
-Tcrist_boundaries <- categorical_boundary(T.cristatus)
-grassland_boundaries <- define_boundary(grassland, 0.1)
+Tcrist_boundaries <- define_boundary(T.cristatus, cat = TRUE)
+grassland_boundaries <- define_boundary(grassland, threshold = 0.1)
 
 plot_boundary(Tcrist_boundaries, grassland_boundaries)
 

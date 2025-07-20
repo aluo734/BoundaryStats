@@ -1,5 +1,5 @@
-# Odirect ----
-#' @name Odirect
+# number of overlapping boundary elements ----
+#' @name n_overlap_boundaries
 #' @title Direct overlap between boundary elements.
 #' @description Statistical test for the number of directly overlapping boundary elements of two traits.
 #'
@@ -19,10 +19,10 @@
 #' 
 #' Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE,
 #'   x_cat = TRUE, n_iterations = 100, x_model = 'random_cluster')
-#' Tcrist_boundaries <- categorical_boundary(T.cristatus)
-#' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' Tcrist_boundaries <- define_boundary(T.cristatus, cat = TRUE)
+#' grassland_boundaries <- define_boundary(grassland, cat = FALSE, threshold = 0.1)
 #' 
-#' Odirect(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+#' n_overlap_boundaries(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
 #' }
 #'
 #' @author Amy Luo
@@ -30,22 +30,22 @@
 #' Jacquez, G.M., Maruca,I S. & Fortin, M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
 #' Fortin, M.-J., Drapeau, P. & Jacquez, G.M. (1996) Quantification of the Spatial Co-Occurrences of Ecological Boundaries. Oikos, 77, 51-60.
 #' @export
-Odirect <- function(x, y, null_distrib) {
+n_overlap_boundaries <- function(x, y, null_distrib) {
   xx <- terra::cells(x, 1)[[1]]
   yy <- terra::cells(y, 1)[[1]]
-  count <- length(intersect(xx, yy))
+  n_overlapping <- length(intersect(xx, yy))
 
-  p <- null_distrib$Odirect(count) %>%
+  p <- null_distrib$n_overlapping(n_overlapping) %>%
     ifelse(. > 0.5, 1 - ., .) %>%
     as.numeric(.)
   names(p) <-'p-value'
-  names(count) <- 'n overlapping boundary elements'
+  names(n_overlapping) <- 'n_overlapping'
 
-  return(c(count, p))
+  return(c(n_overlapping, p))
 }
 
-# Ox ----
-#' @name Ox
+# average minimum distance from boundaries in x to boundaries in y ----
+#' @name average_min_x_to_y
 #' @title Average minimum distance from x boundary elements to nearest y boundary element.
 #' @description
 #' Statistical test for the average minimum distance between each boundary element in raster x
@@ -69,10 +69,10 @@ Odirect <- function(x, y, null_distrib) {
 #' 
 #' Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE,
 #'   x_cat = TRUE, n_iterations = 100, x_model = 'random_cluster')
-#' Tcrist_boundaries <- categorical_boundary(T.cristatus)
-#' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' Tcrist_boundaries <- define_boundary(T.cristatus, cat = TRUE)
+#' grassland_boundaries <- define_boundary(grassland, cat = FALSE, threshold = 0.1)
 #' 
-#' Ox(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+#' average_min_x_to_y(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
 #' }
 #'
 #' @author Amy Luo
@@ -80,7 +80,7 @@ Odirect <- function(x, y, null_distrib) {
 #' Jacquez, G.M., Maruca,I S. & Fortin,M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
 #' Fortin, M.-J., Drapeau, P. & Jacquez, G.M. (1996) Quantification of the Spatial Co-Occurrences of Ecological Boundaries. Oikos, 77, 51-60.
 #' @export
-Ox <- function(x, y, null_distrib) {
+average_min_x_to_y <- function(x, y, null_distrib) {
   x_min_distances <- c()
 
   x_bound_cells <- terra::xyFromCell(x, terra::cells(x, 1)[[1]])
@@ -88,18 +88,18 @@ Ox <- function(x, y, null_distrib) {
   dists <- terra::distance(x_bound_cells, y_bound_cells, lonlat = T)
   for (i in sequence(nrow(dists))) {x_min_distances <- append(x_min_distances, min(dists[i,]))} # for each x boundary cell, the minimum distance to a y boundary cell
 
-  ave_min_dist <- mean(x_min_distances)
-  names(ave_min_dist) <- 'average minimum distance (x depends on y)'
+  avg_min_x_to_y <- mean(x_min_distances)
+  names(avg_min_x_to_y) <- 'avg_min_x_to_y'
 
-  p <- null_distrib$Ox(ave_min_dist) %>%
+  p <- null_distrib$avg_min_x_to_y(avg_min_x_to_y) %>%
     ifelse(. > 0.5, 1 - ., .) %>%
     as.numeric(.)
   names(p) <- 'p-value'
-  return(c(ave_min_dist, p))
+  return(c(avg_min_x_to_y, p))
 }
 
-# Oxy ----
-#' @name Oxy
+# average minimum distance between boundaries (reciprocal) ----
+#' @name average_min_distance
 #' @title Average minimum distance between boundary elements of two variables
 #' @description
 #' Statistical test for the average minimum distance between boundary elements in two raster layers.
@@ -122,10 +122,10 @@ Ox <- function(x, y, null_distrib) {
 #' 
 #' Tcrist_ovlp_null <- overlap_null_distrib(T.cristatus, grassland, rand_both = FALSE,
 #'   x_cat = TRUE, n_iterations = 100, x_model = 'random_cluster')
-#' Tcrist_boundaries <- categorical_boundary(T.cristatus)
-#' grassland_boundaries <- define_boundary(grassland, 0.1)
+#' Tcrist_boundaries <- define_boundary(T.cristatus, cat = TRUE)
+#' grassland_boundaries <- define_boundary(grassland, cat = FALSE, threshold = 0.1)
 #' 
-#' Oxy(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
+#' average_min_distance(Tcrist_boundaries, grassland_boundaries, Tcrist_ovlp_null)
 #' }
 #'
 #' @author Amy Luo
@@ -133,7 +133,7 @@ Ox <- function(x, y, null_distrib) {
 #' Jacquez, G.M., Maruca,I S. & Fortin, M.-J. (2000) From fields to objects: A review of geographic boundary analysis. Journal of Geographical Systems, 3, 221, 241.
 #' Fortin, M.-J., Drapeau, P. & Jacquez, G.M. (1996) Quantification of the Spatial Co-Occurrences of Ecological Boundaries. Oikos, 77, 51-60.
 #' @export
-Oxy <- function(x, y, null_distrib) {
+average_min_distance <- function(x, y, null_distrib) {
   min_distances <- c()
   
   x_bound_cells <- terra::xyFromCell(x, terra::cells(x, 1)[[1]])
@@ -142,12 +142,12 @@ Oxy <- function(x, y, null_distrib) {
   for (i in sequence(nrow(dists))) {min_distances <- append(min_distances, min(dists[i,]))} # for each x boundary cell, the minimum distance to a y boundary cell
   for (i in sequence(ncol(dists))) {min_distances <- append(min_distances, min(dists[,i]))} # for each x boundary cell, the minimum distance to a y boundary cell
   
-  ave_min_dist <- mean(min_distances)
-  names(ave_min_dist) <- 'average minimum distance'
+  avg_min_dist <- mean(min_distances)
+  names(avg_min_dist) <- 'avg_min_dist'
 
-  p <- null_distrib$Oxy(ave_min_dist) %>%
+  p <- null_distrib$avg_min_dist(avg_min_dist) %>%
     ifelse(. > 0.5, 1 - ., .) %>%
     as.numeric(.)
   names(p) <- 'p-value'
-  return(c(ave_min_dist, p))
+  return(c(avg_min_dist, p))
 }

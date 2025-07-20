@@ -13,6 +13,8 @@ categorical_boundary(x)
 A SpatRaster object with cell values 1 for boundary elements and 0 for other cells
 }
 \description{
+This function is deprecated. Please use \code{\link{define_boundary}}
+
 Creates boundary element cells where patches of two categories meet.
 }
 \examples{

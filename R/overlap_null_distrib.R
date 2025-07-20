@@ -9,8 +9,8 @@
 #' @param x A SpatRaster object. If rand_both = FALSE, only this raster will be modeled.
 #' @param y A SpatRaster object. If rand_both = FALSE, this raster does not change.
 #' @param rand_both TRUE if distribution of traits in x and y should be modeled.
-#' @param x_convert TRUE if x contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.
-#' @param y_convert TRUE if y contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.
+#' @param x_calculate_intensity TRUE if x contains numeric trait data from which boundary intensities should be calculated. default = FALSE.
+#' @param y_calculate_intensity TRUE if y contains numeric trait data from which boundary intensities should be calculated. default = FALSE.
 #' @param x_cat TRUE if x contains a categorical variable. default = FALSE.
 #' @param y_cat TRUE if y contains a categorical variable. default = FALSE.
 #' @param threshold A value between 0 and 1. The proportion of cells to keep as
@@ -44,28 +44,40 @@
 #' @author Amy Luo
 #' @references Saura, S. & Martínez-Millán, J. (2000). Landscape patterns simulation with a modified random clusters method. Landscape Ecology, 15:661-678.
 #' @export
-overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert = FALSE, x_cat = FALSE, y_cat = FALSE,
+overlap_null_distrib <- function(x, y, rand_both, x_calculate_intensity = FALSE, y_calculate_intensity = FALSE, x_cat = FALSE, y_cat = FALSE,
                                  threshold = 0.2, n_iterations = 10, x_model = 'random', y_model = 'random',
                                  px = 0.5, py = 0.5, progress = TRUE) {
   # progress bar
   if (progress == TRUE) {progress_bar = txtProgressBar(min = 0, max = n_iterations, initial = 0, char = '+', style = 3)}
 
   # make output vectors for repeat loop
-  Odirect = c(); Ox = c(); Oxy = c()
+  n_overlapping = c(); avg_min_x_to_y = c(); avg_min_dist = c()
 
   # if not randomizing y model, find boundaries in y
-  if (rand_both == FALSE) {
-    if (y_cat == FALSE) {
-      y_boundary <- define_boundary(y, threshold, y_convert)
-    } else {
-      y_boundary <- categorical_boundary(y)
-    }
+  if (rand_both == FALSE) {y_boundary <- suppressMessages(define_boundary(y, y_cat, threshold, y_calculate_intensity))}
+
+  # if the model for x is Gaussian, estimate the autocorrelation range in the input raster
+  if (x_model == 'gaussian') {
+    pts <- terra::spatSample(x, size = length(terra::cells(x)), method = 'regular', na.rm = TRUE, as.points = TRUE) %>%
+      terra::as.data.frame(geom = 'XY')
+    colnames(pts)[1] <- 'value'
+    vgm <- gstat::gstat(formula = value~1, locations = ~x+y, data = pts) %>%
+      gstat::variogram()
+    vgm <- suppressWarnings(gstat::fit.variogram(vgm, model = gstat::vgm(c('Exp', 'Sph', 'Gau', 'Mat'))))
+    range_x <- vgm$range[2]
   }
-
-  # if Gaussian is chosen, calculate spatial autocorrelation distance with LISA clusters
-  if (x_model == 'gaussian') {corr_x <- lisa_clusters(x)}
-  if (y_model == 'gaussian') {corr_y <- lisa_clusters(y)}
-
+  
+  # if the model for y is Gaussian, estimate the autocorrelation range in the input raster
+  if (y_model == 'gaussian') {
+    pts <- terra::spatSample(x, size = length(terra::cells(x)), method = 'regular', na.rm = TRUE, as.points = TRUE) %>%
+      terra::as.data.frame(geom = 'XY')
+    colnames(pts)[1] <- 'value'
+    vgm <- gstat::gstat(formula = value~1, locations = ~x+y, data = pts) %>%
+      gstat::variogram()
+    vgm <- suppressWarnings(gstat::fit.variogram(vgm, model = gstat::vgm(c('Exp', 'Sph', 'Gau', 'Mat'))))
+    range_y <- vgm$range[2]
+  }
+  
   # n iterations of random boundaries + stats
   rep = 0
   repeat {
@@ -75,16 +87,12 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert =
       if (x_model == 'random') {
         x_sim <- random_raster_sim(x)
       } else if (x_model == 'gaussian') {
-        x_sim <- gauss_random_field_sim(x, corr_x)
+        x_sim <- gauss_random_field_sim(x, range_x)
       } else if (x_model == 'random_cluster') {
         x_sim <- mod_random_clust_sim(x, px)
       }
 
-      if (x_cat == FALSE) {
-        x_boundary <- define_boundary(x_sim, threshold, x_convert)
-      } else {
-        x_boundary <- categorical_boundary(x_sim)
-      }
+      x_boundary <- suppressMessages(define_boundary(x_sim, x_cat, threshold, x_calculate_intensity))
 
       if (sum(terra::values(x_boundary) == 1, na.rm = TRUE) >= 1) {break}
     }
@@ -94,13 +102,13 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert =
         if (y_model == 'random') {
           y_sim <- random_raster_sim(y)
         } else if (y_model == 'gaussian') {
-          y_sim <- gauss_random_field_sim(y, corr_y)
+          y_sim <- gauss_random_field_sim(y, range_y)
         } else if (y_model == 'random_cluster') {
           y_sim <- mod_random_clust_sim(y, py)
         }
 
         if (y_cat == FALSE) {
-          y_boundary <- define_boundary(y_sim, threshold, y_convert)
+          y_boundary <- define_boundary(y_sim, threshold, y_calculate_intensity)
         } else {
           y_boundary <- categorical_boundary(y_sim)
         }
@@ -114,7 +122,7 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert =
     yy <- terra::cells(y_boundary, 1)[[1]]
     count <- length(intersect(xx, yy))
 
-    Odirect <- append(Odirect, count)
+    n_overlapping <- append(n_overlapping, count)
 
     # average minimum distance statistic (Ox; one boundary influences the other) ----
     x_min_distances <- c()
@@ -126,7 +134,7 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert =
 
     x_ave_min_dist <- mean(x_min_distances)
 
-    Ox <- append(Ox, x_ave_min_dist)
+    avg_min_x_to_y <- append(avg_min_x_to_y, x_ave_min_dist)
 
     # average minimum distance statistic (Oxy; both boundaries influence each other) ----
     # distance matrix already calculated in last portion, just recalculate the average minimum distance
@@ -136,8 +144,8 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert =
 
     ave_min_dist <- mean(xy_min_distances)
 
-    Oxy <- mean(xy_min_distances) %>%
-      append(Oxy, .)
+    avg_min_dist <- mean(xy_min_distances) %>%
+      append(avg_min_dist, .)
 
     # loop count and break ----
     rep = rep + 1
@@ -149,11 +157,11 @@ overlap_null_distrib <- function(x, y, rand_both, x_convert = FALSE, y_convert =
   }
 
   # output
-  Odirect <- pdqr::new_p(Odirect, type = 'continuous')
-  Ox <- pdqr::new_p(Ox, type = 'continuous')
-  Oxy <- pdqr::new_p(Oxy, type = 'continuous')
-  distribs <- list(Odirect, Ox, Oxy)
-  names(distribs) <- c('Odirect', 'Ox', 'Oxy')
+  n_overlapping <- stats::ecdf(n_overlapping)
+  avg_min_x_to_y <- stats::ecdf(avg_min_x_to_y)
+  avg_min_dist <- stats::ecdf(avg_min_dist)
+  distribs <- list(n_overlapping, avg_min_x_to_y, avg_min_dist)
+  names(distribs) <- c('n_overlapping', 'avg_min_x_to_y', 'avg_min_dist')
 
   message('DONE')
 

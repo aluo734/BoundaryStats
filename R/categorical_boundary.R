@@ -1,6 +1,8 @@
 #' @name categorical_boundary
 #' @title Define the boundary elements of a SpatRaster with categorical data
-#' @description Creates boundary element cells where patches of two categories meet.
+#' @description This function is deprecated. Please use \code{\link{define_boundary}}
+#' 
+#' Creates boundary element cells where patches of two categories meet.
 #'
 #' @param x A SpatRaster object.
 #' @return A SpatRaster object with cell values 1 for boundary elements and 0 for other cells
@@ -16,6 +18,8 @@
 #' @author Amy Luo
 #' @export
 categorical_boundary <- function(x) {
+  .Deprecated('define_boundary')
+  
   x_poly <- terra::as.polygons(x)
   mask <- terra::aggregate(x_poly) %>%
     terra::as.lines(.) %>%

@@ -4,22 +4,33 @@
 \alias{define_boundary}
 \title{Define the boundary elements of a SpatRaster with numeric data or boundary intensities}
 \usage{
-define_boundary(x, threshold = 0.2, convert = FALSE)
+define_boundary(x, cat = FALSE, threshold = 0.2, calculate_intensity = FALSE)
 }
 \arguments{
 \item{x}{A SpatRaster object.}
 
+\item{cat}{TRUE if the input SpatRaster contains a categorical variable. default = FALSE.}
+
 \item{threshold}{A value between 0 and 1. The proportion of cells to keep as boundary elements. default = 0.2.}
 
-\item{convert}{logical. If TRUE, convert values of each cell from trait values to boundary intensities. default = FALSE.}
+\item{calculate_intensity}{logical. If TRUE, calculate boundary intensity at each cell from trait data. default = FALSE.}
 }
 \value{
 A SpatRaster object with cell values 1 for boundary elements and 0 for other cells
 }
 \description{
-Defines boundaries in a SpatRaster object by keeping a proportion of the cells with the highest
-boundary intensity values. If the SpatRaster contains trait values, the values can be converted
-to boundary/edge values (convert = T) using a Sobel-Feldman operator.
+Defines boundary elements in a SpatRaster object.
+
+For categorical traits, boundary elements are defined as cells that neighbor a patch with a different value.
+
+If the trait is quantitative, function will keep a proportion of the cells with the highest boundary intensity values,
+with a threshold chosen by the user. If the SpatRaster contains trait values, boundary intensity values can be
+calculated (calculate_intensity = T) using a Sobel-Feldman operator.
+
+In some cases, there may be many redundant values for boundary intensity. If the threshold is set to cut off the values
+at those points, the actual proportion of cells categorized as boundary elements would differ from the intended
+threshold. The proportion of cells categorized as boundary elements is output in a method, so that users can choose a
+different value, if necessary.
 }
 \examples{
 \donttest{
@@ -27,7 +38,7 @@ data(grassland)
 grassland <- terra::rast(grassland_matrix, crs = grassland_crs)
 terra::ext(grassland) <- grassland_ext
 
-grassland_boundaries <- define_boundary(grassland, 0.1)
+grassland_boundaries <- define_boundary(grassland, threshold = 0.1)
 }
 
 }
