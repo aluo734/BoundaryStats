@@ -29,7 +29,7 @@ calculated (calculate_intensity = T) using a Sobel-Feldman operator.
 
 In some cases, there may be many redundant values for boundary intensity. If the threshold is set to cut off the values
 at those points, the actual proportion of cells categorized as boundary elements would differ from the intended
-threshold. The proportion of cells categorized as boundary elements is output in a method, so that users can choose a
+threshold. The function reports the proportion of cells that are boundary elements, so that users can choose a
 different value, if necessary.
 }
 \examples{
