@@ -6,7 +6,7 @@
 \usage{
 boundary_null_distrib(
   x,
-  convert = FALSE,
+  calculate_intensity = FALSE,
   cat = FALSE,
   threshold = 0.2,
   n_iterations = 10,
@@ -18,7 +18,7 @@ boundary_null_distrib(
 \arguments{
 \item{x}{A SpatRaster object.}
 
-\item{convert}{TRUE if x contains numeric trait data that needs to be converted to boundary intensities. default = FALSE.}
+\item{calculate_intensity}{TRUE if x contains numeric trait data from which boundary intensities should be calculated. default = FALSE.}
 
 \item{cat}{TRUE if the input SpatRaster contains a categorical variable. default = FALSE.}
 
@@ -48,10 +48,10 @@ surfaces from a neutral model.
 \donttest{
 data(T.cristatus)
 T.cristatus <- terra::rast(T.cristatus_matrix, crs = T.cristatus_crs)
-terra::ext(T.cristatus) <- T.cristatus_ext
+  terra::ext(T.cristatus) <- T.cristatus_ext
 
-T.crist_bound_null <- boundary_null_distrib(T.cristatus, cat = TRUE, n_iterations = 100,
-model = 'random_cluster')
+T.crist_bound_null <- boundary_null_distrib(T.cristatus, cat = TRUE,
+n_iterations = 100, model = 'random_cluster')
 }
 
 }

@@ -16,42 +16,27 @@
 #' @author Amy Luo
 #' @export
 sobel_operator <- function(x) {
-  x_mat <- terra::as.matrix(x, wide = TRUE)
+  # filters
   gx <- matrix(c(1, 2, 1, 0, 0, 0, -1, -2, -1), nrow = 3)
   gy <- matrix(c(1, 0, -1, 2, 0, -2, 1, 0, -1), nrow = 3)
   
-  d <- matrix(nrow = nrow(x_mat), ncol = ncol(x_mat))
+  # empty raster with same resolution, crs, and extent as input raster
+  out <- terra::rast(nrows = nrow(x), ncols = ncol(x), extent = terra::ext(x), crs = terra::crs(x))
   
-  a <- matrix(nrow = 3, ncol = 3)
-  for (row in 1:nrow(x_mat)) {
-    for (col in 1:ncol(x_mat)) {
-      # values in raster to multiply by mask
-      if(row - 1 > 0 & col - 1 > 0) {a[1,1] = x_mat[row - 1, col - 1]} else {a[1,1] = 0}
-      if (row - 1 > 0) {a[1,2] = x_mat[row - 1, col]} else {a[1,2] = 0}
-      if(row - 1 > 0 & col < ncol(x_mat)) {a[1,3] = x_mat[row - 1, col + 1]} else {a[1,3] = 0}
-      
-      if (col - 1 > 0) {a[2,1] = x_mat[row, col - 1]} else {a[2,1] = 0}
-      a[2,2] = x_mat[row, col]
-      if (col < ncol(x_mat)) {a[2,3] = x_mat[row, col + 1]} else {a[2,3] = 0}
-      
-      if (row < nrow(x_mat) & col - 1 > 0) {a[3,1] = x_mat[row + 1, col - 1]} else {a[3,1] = 0}
-      if (row < nrow(x_mat)) {a[3,2] = x_mat[row + 1, col]} else {a[3,2] = 0}
-      if (row < nrow(x_mat) & col < ncol(x_mat)) {a[3,3] = x_mat[row + 1, col + 1]} else {a[3,3] = 0}
-
-      gxa <- sum(gx*a)
-      gya <- sum(gy*a)
-      d[row, col] = sqrt(gxa ^ 2 + gya ^ 2)
+  # transform values from input raster to boundary intensities
+  for (i in terra::cells(x)) {
+    neighbors <- terra::adjacent(out, i, 'queen', include = TRUE) %>%
+      terra::values(x)[.]
+    
+    if (length(na.omit(neighbors)) == 9) {
+      neighbors <- matrix(neighbors, 3, 3)
+      gxa <- sum(neighbors*gx, na.rm = T)
+      gya <- sum(neighbors*gy, na.rm = T)
+      out[i] <- sqrt(gxa ^ 2 + gya ^ 2)
+    } else {
+      out[i] = NA
     }
   }
-
-  out <- terra::rast(d)
-  
-  for (i in 1:length(out)) {
-    if (length(terra::adjacent(out, i, 'queen')) < 8) {terra::values(out)[i] = 0}
-  }
-  
-  terra::ext(out) <- terra::ext(x)
-  terra::crs(out) <- terra::crs(x)
 
   return(out)
 }

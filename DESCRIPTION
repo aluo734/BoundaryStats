@@ -1,12 +1,12 @@
 Package: BoundaryStats
 Type: Package
 Title: Boundary Overlap Statistics
-Version: 2.2.0
+Version: 2.3.0
 Authors@R: c(
   person(given = 'Amy',
         family = 'Luo',
         role = c('aut', 'cre', 'cph'),
-        email = 'aluo@vols.utk.edu',
+        email = 'amy.luo.15@gmail.com',
         comment = c(ORCID = '0000-0002-9197-4673')),
   person(given = 'Elizabeth',
         family = 'Derryberry',
@@ -18,9 +18,8 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Imports:
-  sf,
   terra,
-  pdqr,
+  gstat,
   methods,
   ggplot2,
   tibble,
@@ -33,4 +32,4 @@ Depends:
   R (>= 4.1.0)
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
