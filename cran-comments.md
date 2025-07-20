@@ -1,4 +1,17 @@
+
 ## Notes
+
+### Version 2.3.0 submission
+
+I made changes suggested by peer reviewers for the R Journal. The major changes were:
+
+* length of boundaries is calculated as distance from farthest points through edges of a subgraph of adjacent boundary elements, instead of straight line between points
+* Gaussian neutral model uses autocorrelation range based on variogram, rather than LISA clusters
+* categorical_boundary function deprecated, and functionality merged with define_boundary function
+* renamed statistical test functions to improve clarity
+* plot_boundary now optionally returns a SpatRaster object with boundary elements and boundary element overlaps
+* removed dependencies on sf and pdqr
+* added dependency on gstat
 
 ### Version 2.2.0 submission
 
